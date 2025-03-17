@@ -224,6 +224,8 @@ Por otro lado agregaría dos nuevos pensados en la administración de la energí
 
 Hay que ajustar también el comando `COM`. Comento puntualmente cada subcomando (la descripción de su funcionalidad ya fue hecha al principio del texto):
 
+- Registro Galáctico Acumulativo: este es muy útil, ya que nos da la información de todo el "mapa conocido"
+
 - Reporte de Estado: no nos aporta nada, lo sacaría; toda la info que está acá o es parte del reporte general o se obtiene con `DAM`
 
 - Calculadora de Dirección/Distancia: este es útil, ya que nos permite calcular algo que sino tendríamos que hacer cuentas aparte (o hacerlas mentalmente, si nos queremos evitar perder tiempo en este subcomando, una decisión a tomar por quien juega)
@@ -234,7 +236,7 @@ Hay que ajustar también el comando `COM`. Comento puntualmente cada subcomando 
 
 - Mapa de Regiones Galácticas: yay, nombres, no tienen otra utilidad, lo sacaría
 
-En definitiva, `COM` tiene sólo un subcomando útil; sin confirmamos esto creo que podríamos re-pensarlo a que haga sólo el cálculo de trayectorias, quizás incluso renombrarlo a `TRA` o similar.
+En definitiva, `COM` tiene sólo dos subcomandos útiles; si confirmamos esto creo que podríamos repensar si tiene sentido un comando `COM` con dos subcomandos, o dos comandos distintos (ej. `TRA` para el cálculo de trayectoria, a ser usado por el oficial militar, y `MAP` para el mapa, a ser usado por el capitán).
 
 Para terminar, haría que `SRS` sólo reporte el mapa; la info extra que trae en el juego original debe ser parte de la pantalla general (estoy seguro que en el juego original se trae via `SRS` porque no se puede actualizar asincrónicamente).
 
