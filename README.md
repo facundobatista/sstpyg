@@ -28,9 +28,9 @@ Ganamos el juego si destruimos todas las naves Klingon antes de la fecha límite
 
 Para interactuar con la nave tenemos los siguientes comandos:
 
-*`NAV` ("Navigation")*: Permite moverse por el espacio. El comando pide ingresar una dirección y un factor warp. Ver abajo en "Movimiento en el espacio".
+**`NAV` ("Navigation")**: Permite moverse por el espacio. El comando pide ingresar una dirección y un factor warp. Ver abajo en "Movimiento en el espacio".
 
-*`SRS` ("Short Range Sensor")*: Muestra un escaneo del cuadrante actual, indicando la posición de la Enterprise, las naves Klingon, bases estelares de la Federación, y estrellas.
+**`SRS` ("Short Range Sensor")**: Muestra un escaneo del cuadrante actual, indicando la posición de la Enterprise, las naves Klingon, bases estelares de la Federación, y estrellas.
 
 Ejemplo:
 ```
@@ -49,7 +49,7 @@ Ejemplo:
 (vemos que también muestra un reporte de estado resumido)
 
 
-*`LRS` ("Long Range Sensor")*: Muestra el estado del espacio en los cuadrantes adyacentes a la Enterprise, indicando para cada cuadrante la cantidad de naves Klingon, de bases estelares, y de estrellas, como un número de 3 dígitos. Ejemplo: `207` significa 2 Klingons, 0 bases estelares, y 7 estrellas.
+**`LRS` ("Long Range Sensor")**: Muestra el estado del espacio en los cuadrantes adyacentes a la Enterprise, indicando para cada cuadrante la cantidad de naves Klingon, de bases estelares, y de estrellas, como un número de 3 dígitos. Ejemplo: `207` significa 2 Klingons, 0 bases estelares, y 7 estrellas.
 
 Ejemplo:
 
@@ -66,13 +66,13 @@ LONG RANGE SCAN FOR QUADRANT 8,4
 
 (la última fila está toda en asterisco porque estamos en el borde inferior de la galaxia)
 
-*`PHA` ("Phasers")*: Permite atacar a las naves Klingon con una cantidad determinada de energía para debilitar sus escudos.
+**`PHA` ("Phasers")**: Permite atacar a las naves Klingon con una cantidad determinada de energía para debilitar sus escudos.
 
-*`TOR` ("Torpedoes")*: Dispara torpedos fotón. Este arma tiene la ventaja de su potencia (si impacta en una nave Klingon la destruye inmediatamente) pero tiene la desventaja de su recorrido lineal (hay que apuntarle al enemigo, y si la dirección es equivocada o en el medio hay una estrella, el disparo será desperdiciado). Para indicar la dirección se usa el mismo sistema de curso que el motor warp, y tenemos la ventaja que la computadora (comando `COM`) puede calcular la trayectoria del torpedo automáticamente.
+**`TOR` ("Torpedoes")**: Dispara torpedos fotón. Este arma tiene la ventaja de su potencia (si impacta en una nave Klingon la destruye inmediatamente) pero tiene la desventaja de su recorrido lineal (hay que apuntarle al enemigo, y si la dirección es equivocada o en el medio hay una estrella, el disparo será desperdiciado). Para indicar la dirección se usa el mismo sistema de curso que el motor warp, y tenemos la ventaja que la computadora (comando `COM`) puede calcular la trayectoria del torpedo automáticamente.
 
-*`SHE` ("Shield")*: Permite asignar una cantidad de energía a los escudos.
+**`SHE` ("Shield")**: Permite asignar una cantidad de energía a los escudos.
 
-*`DAM` ("Damage")*: Muestra el estado de reparación de todos los sistemas. Ejemplo:
+**`DAM` ("Damage")**: Muestra el estado de reparación de todos los sistemas. Ejemplo:
 
 ```
 DEVICE             STATE OF REPAIR
@@ -88,11 +88,7 @@ LIBRARY-COMPUTER           0
 
 Si el estado de un sistema es negativo, significa que está temporalmente "fuera de servicio".
 
-*`COM` ("Computer")*: Permite acceder a la computadora de la nave; tiene seis opciones disponibles:
-
-
-### **`COM` - Computadora de la Biblioteca**
-La computadora tiene seis opciones disponibles:
+**`COM` ("Computer")**: Permite acceder a la computadora de la nave; tiene seis opciones disponibles:
 
 - Registro Galáctico Acumulativo: Muestra la memoria de la computadora con los resultados de todos los escaneos anteriores de sensores de corto y largo alcance. Ejemplo:
 
@@ -160,7 +156,7 @@ La dirección del curso sigue un sistema "numérico circular":
          4  3  2
           . . .
            ...
-      5 ---*--- 1
+       5 ---*--- 1
            ...
           . . .
          6  7  8
@@ -189,11 +185,11 @@ Los phasers son guiados por la computadora e impactan automáticamente en todas 
 
 Con respecto a la defensa tenemos únicamente el Escudo, que funciona a dos niveles. Por un lado absorbe impacto del ataque según la carga que tenga (aunque no de forma determinística); por ejemplo:
 
-    - la fuerza del ataque es de 500 unidades de energía
-    - el escudo tiene cargado 400, pero a nivel efectivo defenderá un poco menos que eso
-    - en el caso del ataque puntual, el azar dice que el escudo protegió 390
-    - el escudo se desgasta (pierde energía) un poco pero no demasiado (sino no tendría sentido tenerlo)
-    - los 110 restantes "impactan en la nave" (se descuentan esos valores de energía)
+- la fuerza del ataque es de 500 unidades de energía
+- el escudo tiene cargado 400, pero a nivel efectivo defenderá un poco menos que eso
+- en el caso del ataque puntual, el azar dice que el escudo protegió 390
+- el escudo se desgasta (pierde energía) un poco pero no demasiado (sino no tendría sentido tenerlo)
+- los 110 restantes "impactan en la nave" (se descuentan esos valores de energía)
 
 Por otro lado, la cobertura del escudoo puede no ser uniforme, y nuestros subsistemas pueden recibir daños puntuales; entonces en cada ataque existe la posibilidad de que se dañe algún subsistema.
 
