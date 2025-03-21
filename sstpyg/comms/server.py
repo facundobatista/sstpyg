@@ -15,11 +15,37 @@ class ServerHandler(BaseHTTPRequestHandler):
             self.send_header("Content-type", "text/plain")
             self.end_headers()
             self.wfile.write(b"Pong")
+
+        elif self.path == "/status":
+            # status = game_logic.get_status()
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+            self.wfile.write(b"result of get_status()")
+
         else:
             self.send_response(404)
             self.send_header("Content-type", "text/plain")
             self.end_headers()
             self.wfile.write(b"Not Found")
+
+    def do_POST(self):
+        if self.path == "/action":
+            # game_logic.action()
+            content_length = int(self.headers["Content-Length"])
+            post_data = self.rfile.read(content_length)
+            print(f"Received move: {post_data}")
+            self.send_response(200)
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+            self.wfile.write(b"Action received")
+
+        else:
+            self.send_response(404)
+            self.send_header("Content-type", "text/plain")
+            self.end_headers()
+            self.wfile.write(b"Not Found"))
+
 
 host = "0.0.0.0"  # Listen on all available network interfaces
 
