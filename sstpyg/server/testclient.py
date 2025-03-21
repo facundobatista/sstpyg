@@ -1,6 +1,10 @@
 import cmd
+import os
+import sys
 
-from sstpyg.server.main import Engine
+sys.path.append(os.getcwd())
+
+from sstpyg.server.main import Engine  # noqa
 
 
 class TestShell(cmd.Cmd):
@@ -10,6 +14,7 @@ class TestShell(cmd.Cmd):
 
     def precmd(self, line):
         line = line.lower()
+        return line
 
     def do_exit(self, arg):
         print("Chau")
