@@ -1,6 +1,6 @@
 import cmd
 
-from .main import Engine
+from sstpyg.server.main import Engine
 
 
 class TestShell(cmd.Cmd):
