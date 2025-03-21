@@ -1,5 +1,5 @@
-from sstpyg.comms import Communications
+from sstpyg.comms.server import run_server
 
 def run():
     print("SERVER!!")
-    print("comms?", Communications)
+    run_server()
