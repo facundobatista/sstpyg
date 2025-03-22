@@ -9,7 +9,6 @@ class ClientHandler:
         Server address is a combination of the host and port.
         """
         self.server_address = server_address
-        self.async_client = httpx.AsyncClient()
         self.sync_client = httpx.Client()
         self._initialize(role)
 
@@ -39,11 +38,11 @@ class ClientHandler:
         return response.text
 
 
-    async def async_status(self):
+    def get_status(self):
         """
         Get status from server.
         """
-        response = await self.async_client.get(f"http://{self.server_address}/command")
+        response = self.sync_client.get(f"http://{self.server_address}/command")
         try:
             return response.json()
         except json.JSONDecodeError:
