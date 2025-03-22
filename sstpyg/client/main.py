@@ -20,6 +20,7 @@ def get_server_info():
         AppState.SUBSYSTEM_WARP_ENGINE: 20,
         AppState.SUBSYSTEM_SHIELD: 50,
         AppState.SUBSYSTEM_IMPULSE: 80,
+        AppState.KLINGON_SHIPS_COORDS: [(1,3), (6,6)]
     }
 
 
@@ -54,6 +55,7 @@ class AppState(Enum):
     SUBSYSTEM_WARP_ENGINE = "SWE"
     SUBSYSTEM_SHIELD = "SSS"
     SUBSYSTEM_IMPULSE = "SSI"
+    KLINGON_SHIPS_COORDS = "KSC"
 
     def __str__(self):
         return AppStateLabels[self.name].value
@@ -70,6 +72,7 @@ class AppStateLabels(Enum):
     SUBSYSTEM_WARP_ENGINE = "Warp Engine"
     SUBSYSTEM_SHIELD = "Shields"
     SUBSYSTEM_IMPULSE = "Impulse"
+    KLINGON_SHIPS_COORDS = "KSC"
 
 
 WINDOW_WIDTH = 1280
@@ -121,12 +124,22 @@ class GameView(arcade.View):
         """Set up the game and initialize the variables."""
 
         # Create the sprite lists
-        self.sprites = arcade.SpriteList()
+        self.background = arcade.SpriteList()
 
         img = "lcars.jpg"
         self.bg_sprite = arcade.Sprite(img)
         self.bg_sprite.position = WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2
-        self.sprites.append(self.bg_sprite)
+        self.background.append(self.bg_sprite)
+    
+        # Klingon ships
+        self.klingon_ships = arcade.SpriteList()
+
+    def generate_klingon_sprite(self, coords):
+        img = "klingon_logo.png"
+        klingon_sprite = arcade.Sprite(img, scale=0.040)
+        klingon_sprite.position = coords
+
+        return klingon_sprite
 
     def draw_map_grid(self):
         GRID_SIZE = 40
@@ -141,6 +154,10 @@ class GameView(arcade.View):
         # Dibujar líneas horizontales
         for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
             arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
+
+        for coords in get_server_info()[AppState.KLINGON_SHIPS_COORDS]:
+            klingon_sprite = self.generate_klingon_sprite((GRID_LEFT + coords[0]*GRID_SIZE - 20, GRID_BOTTOM + coords[1]*GRID_SIZE -20))
+            self.klingon_ships.append(klingon_sprite)
 
     def draw_lrs(self):
         GRID_SIZE = 40
@@ -169,16 +186,16 @@ class GameView(arcade.View):
         # This command should happen before we start drawing. It will clear
         # the screen to the background color, and erase what we drew last frame.
         self.clear()
-        self.sprites.draw()
+        self.background.draw()
         self.stardate.draw()
         self.prompt.draw()
         if self.show_grid:
             self.draw_map_grid()
+            self.klingon_ships.draw()
         if self.show_lrs:
             self.draw_lrs()
         if self.show_status:
             self.draw_status()
-        # Call draw() on all your sprite lists below
 
     def on_update(self, delta_time):
         """
