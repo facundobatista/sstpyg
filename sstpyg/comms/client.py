@@ -42,7 +42,7 @@ class ClientHandler:
         """
         Get status from server.
         """
-        response = self.sync_client.get(f"http://{self.server_address}/command")
+        response = self.sync_client.get(f"http://{self.server_address}/status")
         try:
             return response.json()
         except json.JSONDecodeError:
