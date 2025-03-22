@@ -10,3 +10,4 @@ def run(server_address, role_param):
     print(asyncio.run(client.initialize(role_param)))
     command_params = {"action": "attack", "position": [1, 2]}
     print(asyncio.run(client.command(command_params)))
+    print(asyncio.run(client.get_status()))

@@ -11,7 +11,7 @@ class ClientHandler:
 
     async def initialize(self, role):
         """
-        Send a GET request to the server.
+        Initialize a client in the server with a specific role.
         """
         response = await self.client.get(f"http://{self.server_address}/initialize/{role}")
         return response.text
@@ -19,7 +19,15 @@ class ClientHandler:
 
     async def command(self, command_params):
         """
-        Send a POST request to the server.
+        Send a command to the server. Command params must be a serializable dictionary.
         """
         response = await self.client.post(f"http://{self.server_address}/command", json=command_params)
+        return response.text
+
+
+    async def status(self):
+        """
+        Get status from server.
+        """
+        response = await self.client.get(f"http://{self.server_address}/command")
         return response.text
