@@ -2,6 +2,7 @@ import arcade
 from sstpyg.comms import Communications
 from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels
 from math import ceil
+from sstpyg.client.utils import abs_coords_to_sector_coords
 
 from pathlib import Path
 
@@ -39,6 +40,7 @@ def get_server_info():
             (1, 3),
             (6, 6),
             (9, 9),
+            (1, 8)
         ],  # Lets use 64x64 and deduce quadrants
         AppState.ENTERPRISE_POSITION: (1, 1),  # 64x64
     }
@@ -89,8 +91,8 @@ class GameView(arcade.View):
         # Klingon ships
         self.klingon_ships = arcade.SpriteList()
 
-        # starbases
-        self.starbases = arcade.SpriteList()
+        # Enterprise
+        self.enterprise = arcade.SpriteList()
 
     def generate_klingon_sprite(self, coords):
         img = RESOURCES_PATH / "klingon_logo.png"
@@ -99,21 +101,18 @@ class GameView(arcade.View):
 
         self.klingon_ships.append(klingon_sprite)
 
-    def generate_starbases_sprite(self, coords):
-        img = RESOURCES_PATH / "starfleet_logo.png"
-        starbase_sprite = arcade.Sprite(img, scale=0.040)
-        starbase_sprite.position = coords
+    def generate_enterprise_sprite(self, coords):
+        img = RESOURCES_PATH / "enterprise.png"
+        enterprise_sprite = arcade.Sprite(img, scale=0.040)
+        enterprise_sprite.position = coords
 
-        self.starbases.append(starbase_sprite)
-
-    def quadrant_to_sector(self, coords):
-        return (coords[0] % 8, coords[1] % 8)
+        self.enterprise.append(enterprise_sprite)
 
     def place_sprites(self, sprite_method, set_of_coords, current_quadrant):
         for coords in set_of_coords:
             coord_quadrant = self.get_quadrant(coords)
             if coord_quadrant == current_quadrant:
-                sector_coords = self.quadrant_to_sector(coords)
+                sector_coords = abs_coords_to_sector_coords(coords)
                 sprite_method(
                     (
                         GRID_LEFT + sector_coords[0] * GRID_SIZE - (GRID_SIZE / 2),
@@ -143,6 +142,13 @@ class GameView(arcade.View):
             get_server_info()[AppState.KLINGON_SHIPS_COORDS],
             quadrant,
         )
+        # Mostrar enterprise
+        self.place_sprites(
+            self.generate_enterprise_sprite,
+            [get_server_info()[AppState.ENTERPRISE_POSITION]],
+            quadrant,
+        )
+        
 
     def draw_lrs(self):
         """Draw the LRS."""
@@ -185,6 +191,7 @@ class GameView(arcade.View):
         if self.show_grid:
             self.draw_map_grid()
             self.klingon_ships.draw()
+            self.enterprise.draw()
         if self.show_lrs:
             self.draw_lrs()
         if self.show_status:
