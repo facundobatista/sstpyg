@@ -30,11 +30,15 @@ RESOURCES_PATH = BASE_PATH / "resources"
 
 
 class GameView(arcade.View):
+
+    def __init__(self, server_address, role):
+        super().__init__()
+        self.server_address = server_address
+        self.role = role
+
     def setup(self):
         """Set up the game and initialize the variables."""
-        server_address = "192.168.111.23:8000"
-        role = "capitan"
-        self.communication = ClientHandler(server_address, role)
+        self.communication = ClientHandler(self.server_address, self.role)
         self.background_color = arcade.color.BLACK
         arcade.load_font(RESOURCES_PATH / "Okuda.otf")
 
@@ -303,13 +307,13 @@ class GameView(arcade.View):
         pass
 
 
-def run():
+def run(server_address, role):
     """Main function"""
     # Create a window class. This is what actually shows up on screen
     window = arcade.Window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE)
 
     # Create and setup the GameView
-    game = GameView()
+    game = GameView(server_address, role)
 
     # Show GameView on screen
     window.show_view(game)
