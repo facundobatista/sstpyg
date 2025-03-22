@@ -1,8 +1,10 @@
+import random
+
 import arcade
 from sstpyg.comms import Communications
 from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels
 from math import ceil
-from sstpyg.client.utils import abs_coords_to_sector_coords
+from sstpyg.client.utils import abs_coords_to_sector_coords, srs_to_positions
 
 from pathlib import Path
 
@@ -46,6 +48,30 @@ def get_server_info():
     }
 
 
+def srs():
+    ls = [
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+    ]
+    srs_list = []
+    row_list = []
+    possible_ships = ["K", "S", "", "B", "E"]
+
+    for i in range(0, 8):
+        for j in range(0, 8):
+            row_list.append(random.choice(possible_ships))
+
+        srs_list.append(row_list)
+    print(srs_list)
+    return srs_list
+
+
 class GameView(arcade.View):
     def setup(self):
         """Set up the game and initialize the variables."""
@@ -75,7 +101,7 @@ class GameView(arcade.View):
             multiline=True,
         )
         self.text_input = ""
-        self.show_grid = True
+        self.show_grid = False
         self.show_lrs = False
         self.show_status = False
         self.show_error = False
@@ -94,7 +120,11 @@ class GameView(arcade.View):
         # Enterprise
         self.enterprise = arcade.SpriteList()
 
+        # Starbases
+        self.starbases = arcade.SpriteList()
+
         self.status_info = {}
+        self.positions = []
 
     def generate_klingon_sprite(self, coords):
         img = RESOURCES_PATH / "klingon_logo.png"
@@ -109,6 +139,13 @@ class GameView(arcade.View):
         enterprise_sprite.position = coords
 
         self.enterprise.append(enterprise_sprite)
+
+    def generate_starbase_sprite(self, coords):
+        img = RESOURCES_PATH / "starfleet_logo.png"
+        starbase_sprite = arcade.Sprite(img, scale=0.040)
+        starbase_sprite.position = coords
+
+        self.starbases.append(starbase_sprite)
 
     def place_sprites(self, sprite_method, set_of_coords, current_quadrant):
         for coords in set_of_coords:
@@ -130,6 +167,11 @@ class GameView(arcade.View):
     def draw_map_grid(self):
         """Draw the map grid."""
         # Dibujar líneas verticales
+
+        k_positions, e_positions, s_positions, b_positions = srs_to_positions(
+            self.positions
+        )
+
         for x in range(GRID_LEFT, GRID_RIGHT + 1, GRID_SIZE):
             arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, LCARSColors.BEIGE.value, 2)
 
@@ -139,15 +181,23 @@ class GameView(arcade.View):
 
         quadrant = self.get_quadrant(self.status_info[AppState.ENTERPRISE_POSITION])
         # Mostrar naves klingon
+        self.klingon_ships.clear()
+        self.enterprise.clear()
+        self.starbases.clear()
+
         self.place_sprites(
             self.generate_klingon_sprite,
-            self.status_info[AppState.KLINGON_SHIPS_COORDS],
+            k_positions,
             quadrant,
         )
-        # Mostrar enterprise
         self.place_sprites(
             self.generate_enterprise_sprite,
-            [self.status_info[AppState.ENTERPRISE_POSITION]],
+            e_positions,
+            quadrant,
+        )
+        self.place_sprites(
+            self.generate_starbase_sprite,
+            s_positions,
             quadrant,
         )
 
@@ -193,6 +243,7 @@ class GameView(arcade.View):
             self.draw_map_grid()
             self.klingon_ships.draw()
             self.enterprise.draw()
+            self.starbases.draw()
         if self.show_lrs:
             self.draw_lrs()
         if self.show_status:
@@ -216,12 +267,14 @@ class GameView(arcade.View):
 
     def process_command(self):
         """Process a command."""
+
         self.show_error = False
         self.show_grid = False
         self.show_lrs = False
         self.show_status = False
 
         if self.text_input == "srs":
+            self.positions = srs()
             self.show_grid = True
             self.show_status = True
         elif self.text_input == "lrs":
