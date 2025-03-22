@@ -96,8 +96,9 @@ class GameView(arcade.View):
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
         )
 
+        self.stardate.text = "STARDATE 41353.2"
         self.prompt = arcade.Text(
-            "", 250, 150, arcade.color.WHITE, 44, font_name="Okuda"
+            "", 260, 35, arcade.color.WHITE, 44, font_name="Okuda"
         )
 
         self.status = arcade.Text(
@@ -112,6 +113,7 @@ class GameView(arcade.View):
         )
         self.text_input = ""
         self.show_grid = False
+        self.show_lrs = False
 
     def setup(self):
         """Set up the game and initialize the variables."""
@@ -125,6 +127,20 @@ class GameView(arcade.View):
         self.sprites.append(self.bg_sprite)
 
     def draw_map_grid(self):
+        GRID_SIZE = 40
+        GRID_LEFT = 260
+        GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
+        GRID_BOTTOM = 220
+        GRID_TOP = GRID_BOTTOM + 40 * 8
+        # Dibujar líneas verticales
+        for x in range(GRID_LEFT, GRID_RIGHT + 1, GRID_SIZE):
+            arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, LCARSColors.BEIGE.value, 2)
+
+        # Dibujar líneas horizontales
+        for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
+            arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
+
+    def draw_lrs(self):
         GRID_SIZE = 40
         GRID_LEFT = 260
         GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
@@ -157,6 +173,8 @@ class GameView(arcade.View):
         self.prompt.draw()
         if self.show_grid:
             self.draw_map_grid()
+        if self.show_lrs:
+            self.draw_lrs()
         # Call draw() on all your sprite lists below
 
     def on_update(self, delta_time):
@@ -165,11 +183,16 @@ class GameView(arcade.View):
         Normally, you'll call update() on the sprite lists that
         need it.
         """
-        self.stardate.text = "STARDATE 41353.2"
+        ...
+
+    def show_status(self):
         status_text = ""
         for key, value in get_server_info().items():
             status_text += f"{key}: {value}\n"
         self.status.text = "STATUS \n" + status_text
+
+    def clear_status(self):
+        self.status.text = ""
 
     def show_text(self):
         self.prompt.text = self.text_input
@@ -177,8 +200,15 @@ class GameView(arcade.View):
     def process_command(self):
         if self.text_input == "srs":
             self.show_grid = True
+            self.show_lrs = False
+            self.show_status()
+        elif self.text_input == "lrs":
+            self.show_grid = False
+            self.show_lrs = True
+            self.draw_lrs()
         else:
             self.show_grid = False
+            self.clear_status()
         self.text_input = ""
 
     def on_key_press(self, key, key_modifiers):
