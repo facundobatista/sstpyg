@@ -45,7 +45,7 @@ def get_server_info():
             (1, 8),
         ],
         AppState.ENTERPRISE_POSITION: (1, 1),
-        AppState.ENTERPRISE_QUADRANT: (1, 1),
+        AppState.ENTERPRISE_QUADRANT: (1, 2),
     }
 
 
@@ -97,8 +97,7 @@ class GameView(arcade.View):
         self.status_info = {}
         self.positions = []
 
-        galactic_registry_row = ['' for x in range(0,9)]
-        galactic_registry = [galactic_registry_row for x in range(0,9)]
+        galactic_registry = [['' for x in range(0,9)] for x in range(0,9)]
 
         self.galactic_registry = galactic_registry
 
@@ -150,9 +149,10 @@ class GameView(arcade.View):
         n_klingons = len(k_positions)
         n_starbases = len(b_positions)
         n_stars = len(s_positions)
-        summary = str(n_klingons) + str(n_starbases) + str(n_starbases)
+        summary = str(n_klingons) + str(n_starbases) + str(n_stars)
         current_quadrant = self.status_info[AppState.ENTERPRISE_QUADRANT]
-        self.galactic_registry[current_quadrant[0], current_quadrant[1]] = summary
+
+        self.galactic_registry[current_quadrant[1] - 1][current_quadrant[0] - 1] = summary
 
         for x in range(GRID_LEFT, GRID_RIGHT + 1, GRID_SIZE):
             arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, LCARSColors.BEIGE.value, 2)
