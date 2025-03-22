@@ -40,7 +40,7 @@ def get_server_info():
             (1, 3),
             (6, 6),
             (9, 9),
-            (1, 8)
+            (1, 8),
         ],  # Lets use 64x64 and deduce quadrants
         AppState.ENTERPRISE_POSITION: (1, 1),  # 64x64
     }
@@ -75,7 +75,7 @@ class GameView(arcade.View):
             multiline=True,
         )
         self.text_input = ""
-        self.show_grid = False
+        self.show_grid = True
         self.show_lrs = False
         self.show_status = False
         self.show_error = False
@@ -93,6 +93,8 @@ class GameView(arcade.View):
 
         # Enterprise
         self.enterprise = arcade.SpriteList()
+
+        self.status_info = {}
 
     def generate_klingon_sprite(self, coords):
         img = RESOURCES_PATH / "klingon_logo.png"
@@ -135,20 +137,19 @@ class GameView(arcade.View):
         for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
             arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
 
-        quadrant = self.get_quadrant(get_server_info()[AppState.ENTERPRISE_POSITION])
+        quadrant = self.get_quadrant(self.status_info[AppState.ENTERPRISE_POSITION])
         # Mostrar naves klingon
         self.place_sprites(
             self.generate_klingon_sprite,
-            get_server_info()[AppState.KLINGON_SHIPS_COORDS],
+            self.status_info[AppState.KLINGON_SHIPS_COORDS],
             quadrant,
         )
         # Mostrar enterprise
         self.place_sprites(
             self.generate_enterprise_sprite,
-            [get_server_info()[AppState.ENTERPRISE_POSITION]],
+            [self.status_info[AppState.ENTERPRISE_POSITION]],
             quadrant,
         )
-        
 
     def draw_lrs(self):
         """Draw the LRS."""
@@ -170,7 +171,7 @@ class GameView(arcade.View):
     def draw_status(self):
         """Draw status."""
         status_text = ""
-        for key, value in get_server_info().items():
+        for key, value in self.status_info.items():
             status_text += f"{key}: {value}\n"
         self.status.text = "STATUS \n" + status_text
         self.status.draw()
@@ -206,6 +207,7 @@ class GameView(arcade.View):
         Normally, you'll call update() on the sprite lists that
         need it.
         """
+        self.status_info = get_server_info()
         ...
 
     def draw_prompt(self):
