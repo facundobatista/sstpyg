@@ -96,6 +96,10 @@ class GameView(arcade.View):
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
         )
 
+        self.prompt = arcade.Text(
+            "", 250, 150, arcade.color.WHITE, 44, font_name="Okuda"
+        )
+
         self.status = arcade.Text(
             "",
             950,
@@ -106,6 +110,7 @@ class GameView(arcade.View):
             width=300,
             multiline=True,
         )
+        self.text_input = ""
 
     def setup(self):
         """Set up the game and initialize the variables."""
@@ -148,6 +153,7 @@ class GameView(arcade.View):
         self.sprites.draw()
         self.stardate.draw()
         self.status.draw()
+        self.prompt.draw()
         self.draw_map_grid()
         # Call draw() on all your sprite lists below
 
@@ -163,14 +169,26 @@ class GameView(arcade.View):
             status_text += f"{key}: {value}\n"
         self.status.text = "STATUS \n" + status_text
 
+    def procesar_texto(self, texto):
+        self.prompt.text = texto
+
     def on_key_press(self, key, key_modifiers):
         """
         Called whenever a key on the keyboard is pressed.
 
         For a full list of keys, see:
+
         https://api.arcade.academy/en/latest/arcade.key.html
         """
-        arcade.close_window()
+        if key == arcade.key.ESCAPE:
+            arcade.close_window()
+        if key == arcade.key.RETURN:
+            self.text_input = ""
+        elif key == arcade.key.BACKSPACE:
+            self.text_input = self.text_input[:-1]
+        else:
+            self.text_input += chr(key)
+        self.procesar_texto(self.text_input)
 
     def on_key_release(self, key, key_modifiers):
         """
