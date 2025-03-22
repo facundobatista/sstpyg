@@ -161,7 +161,7 @@ class GameView(arcade.View):
         status_text = ""
         for key, value in get_server_info().items():
             status_text += f"{key}: {value}\n"
-        self.status.text = "STATUS: \n" + status_text
+        self.status.text = "STATUS \n" + status_text
 
     def on_key_press(self, key, key_modifiers):
         """
