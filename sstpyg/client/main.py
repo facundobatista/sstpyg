@@ -274,7 +274,7 @@ class GameView(arcade.View):
         self.show_grs = False
 
         if self.text_input == "srs":
-            self.positions = self.communication.command({"command": "src"})
+            self.positions = self.communication.command({"command": "srs"})
             self.show_grid = True
             self.show_status = True
         elif self.text_input == "lrs":
