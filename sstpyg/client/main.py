@@ -81,17 +81,8 @@ WINDOW_TITLE = "LCARS Template"
 
 
 class GameView(arcade.View):
-    """
-    Main application class.
-
-    NOTE: Go ahead and delete the methods you don't need.
-    If you do need a method, delete the 'pass' and replace it
-    with your own code. Don't leave 'pass' in this program.
-    """
-
-    def __init__(self):
-        super().__init__()
-
+    def setup(self):
+        """Set up the game and initialize the variables."""
         self.background_color = arcade.color.BLACK
         arcade.load_font("Okuda.otf")
 
@@ -123,9 +114,6 @@ class GameView(arcade.View):
         self.show_status = False
         self.show_error = False
 
-    def setup(self):
-        """Set up the game and initialize the variables."""
-
         # Create the sprite lists
         self.background = arcade.SpriteList()
 
@@ -145,6 +133,7 @@ class GameView(arcade.View):
         return klingon_sprite
 
     def draw_map_grid(self):
+        """Draw the map grid."""
         GRID_SIZE = 40
         GRID_LEFT = 260
         GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
@@ -168,12 +157,7 @@ class GameView(arcade.View):
             self.klingon_ships.append(klingon_sprite)
 
     def draw_lrs(self):
-        GRID_SIZE = 40
-        GRID_LEFT = 260
-        GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
-        GRID_BOTTOM = 220
-        GRID_TOP = GRID_BOTTOM + 40 * 8
-
+        """Draw the LRS."""
         for i in range(3):
             arcade.draw_text(
                 "000 001 002",
@@ -185,8 +169,17 @@ class GameView(arcade.View):
             )
 
     def draw_error_message(self):
+        """Draw error message."""
         self.error_message.text = "ERROR"
         self.error_message.draw()
+
+    def draw_status(self):
+        """Draw status."""
+        status_text = ""
+        for key, value in get_server_info().items():
+            status_text += f"{key}: {value}\n"
+        self.status.text = "STATUS \n" + status_text
+        self.status.draw()
 
     def reset(self):
         """Reset the game to the initial state."""
@@ -197,9 +190,6 @@ class GameView(arcade.View):
         """
         Render the screen.
         """
-
-        # This command should happen before we start drawing. It will clear
-        # the screen to the background color, and erase what we drew last frame.
         self.clear()
         self.background.draw()
         self.stardate.draw()
@@ -223,17 +213,12 @@ class GameView(arcade.View):
         """
         ...
 
-    def draw_status(self):
-        status_text = ""
-        for key, value in get_server_info().items():
-            status_text += f"{key}: {value}\n"
-        self.status.text = "STATUS \n" + status_text
-        self.status.draw()
-
-    def show_text(self):
+    def draw_prompt(self):
+        """Draw prompt."""
         self.prompt.text = self.text_input
 
     def process_command(self):
+        """Process a command."""
         self.show_error = False
         self.show_grid = False
         self.show_lrs = False
@@ -265,29 +250,11 @@ class GameView(arcade.View):
             self.text_input = self.text_input[:-1]
         else:
             self.text_input += chr(key)
-        self.show_text()
+        self.draw_prompt()
 
     def on_key_release(self, key, key_modifiers):
         """
         Called whenever the user lets off a previously pressed key.
-        """
-        pass
-
-    def on_mouse_motion(self, x, y, delta_x, delta_y):
-        """
-        Called whenever the mouse moves.
-        """
-        pass
-
-    def on_mouse_press(self, x, y, button, key_modifiers):
-        """
-        Called when the user presses a mouse button.
-        """
-        pass
-
-    def on_mouse_release(self, x, y, button, key_modifiers):
-        """
-        Called when a user releases a mouse button.
         """
         pass
 
