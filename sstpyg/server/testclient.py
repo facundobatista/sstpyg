@@ -24,7 +24,15 @@ class TestShell(cmd.Cmd):
     # -- commands
 
     def do_galaxy(self, arg):
-        self.engine.cmd_galaxy()
+        self.engine.command("galaxy")
+
+    def do_fake_srs(self, arg):
+        print("==== fake")
+        self.engine.cmd_srs()
+
+    def do_srs(self, arg):
+        print("==== real")
+        self.engine.command("srs")
 
 
 if __name__ == '__main__':
