@@ -28,28 +28,6 @@ BASE_PATH = Path(__file__).parent
 RESOURCES_PATH = BASE_PATH / "resources"
 
 
-def get_server_info():
-    return {
-        AppState.REMAINING_KLINGONS: 10,
-        AppState.REMAINING_DAYS: 10,
-        AppState.SHIP_TOTAL_ENERGY: 10,
-        AppState.SHIP_ENG_ENERGY: 10,
-        AppState.SHIP_OK: True,
-        AppState.SUBSYSTEM_TORPEDO: 20,
-        AppState.SUBSYSTEM_PHASERS: 20,
-        AppState.SUBSYSTEM_WARP_ENGINE: 20,
-        AppState.SUBSYSTEM_SHIELD: 50,
-        AppState.SUBSYSTEM_IMPULSE: 80,
-        AppState.KLINGON_SHIPS_COORDS: [
-            (1, 3),
-            (6, 6),
-            (8, 8),
-            (1, 8),
-        ],
-        AppState.ENTERPRISE_POSITION: (1, 1),
-        AppState.ENTERPRISE_QUADRANT: (1, 2),
-    }
-
 
 class GameView(arcade.View):
     def setup(self):
