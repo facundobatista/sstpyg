@@ -91,13 +91,7 @@ class GameView(arcade.View):
         self.background.append(self.bg_sprite)
 
         # Klingon ships
-        self.klingon_ships = arcade.SpriteList()
-
-        # Enterprise
-        self.enterprise = arcade.SpriteList()
-
-        # Starbases
-        self.starbases = arcade.SpriteList()
+        self.space_objects = arcade.SpriteList()
 
         self.status_info = {}
         self.positions = []
@@ -107,21 +101,28 @@ class GameView(arcade.View):
         klingon_sprite = arcade.Sprite(img, scale=0.040)
         klingon_sprite.position = coords
 
-        self.klingon_ships.append(klingon_sprite)
+        self.space_objects.append(klingon_sprite)
 
     def generate_enterprise_sprite(self, coords):
         img = RESOURCES_PATH / "enterprise.png"
         enterprise_sprite = arcade.Sprite(img, scale=0.040)
         enterprise_sprite.position = coords
 
-        self.enterprise.append(enterprise_sprite)
+        self.space_objects.append(enterprise_sprite)
 
     def generate_starbase_sprite(self, coords):
         img = RESOURCES_PATH / "starfleet_logo.png"
         starbase_sprite = arcade.Sprite(img, scale=0.040)
         starbase_sprite.position = coords
 
-        self.starbases.append(starbase_sprite)
+        self.space_objects.append(starbase_sprite)
+
+    def generate_star_sprite(self, coords):
+        img = RESOURCES_PATH / "star.png"
+        star_sprite = arcade.Sprite(img, scale=0.040)
+        star_sprite.position = coords
+
+        self.space_objects.append(star_sprite)
 
     def place_sprites(self, sprite_method, set_of_coords, current_quadrant):
         for coords in set_of_coords:
@@ -157,9 +158,7 @@ class GameView(arcade.View):
 
         quadrant = self.get_quadrant(self.status_info[AppState.ENTERPRISE_POSITION])
         # Mostrar naves klingon
-        self.klingon_ships.clear()
-        self.enterprise.clear()
-        self.starbases.clear()
+        self.space_objects.clear()
 
         self.place_sprites(
             self.generate_klingon_sprite,
@@ -173,6 +172,11 @@ class GameView(arcade.View):
         )
         self.place_sprites(
             self.generate_starbase_sprite,
+            b_positions,
+            quadrant,
+        )
+        self.place_sprites(
+            self.generate_star_sprite,
             s_positions,
             quadrant,
         )
@@ -217,9 +221,7 @@ class GameView(arcade.View):
         self.prompt.draw()
         if self.show_grid:
             self.draw_map_grid()
-            self.klingon_ships.draw()
-            self.enterprise.draw()
-            self.starbases.draw()
+            self.space_objects.draw()
         if self.show_lrs:
             self.draw_lrs()
         if self.show_status:
