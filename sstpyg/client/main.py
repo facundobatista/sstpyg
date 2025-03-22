@@ -114,6 +114,8 @@ class GameView(arcade.View):
         self.text_input = ""
         self.show_grid = False
         self.show_lrs = False
+        self.show_status = False
+        self.show_error = False
 
     def setup(self):
         """Set up the game and initialize the variables."""
@@ -169,12 +171,13 @@ class GameView(arcade.View):
         self.clear()
         self.sprites.draw()
         self.stardate.draw()
-        self.status.draw()
         self.prompt.draw()
         if self.show_grid:
             self.draw_map_grid()
         if self.show_lrs:
             self.draw_lrs()
+        if self.show_status:
+            self.draw_status()
         # Call draw() on all your sprite lists below
 
     def on_update(self, delta_time):
@@ -185,11 +188,12 @@ class GameView(arcade.View):
         """
         ...
 
-    def show_status(self):
+    def draw_status(self):
         status_text = ""
         for key, value in get_server_info().items():
             status_text += f"{key}: {value}\n"
         self.status.text = "STATUS \n" + status_text
+        self.status.draw()
 
     def clear_status(self):
         self.status.text = ""
@@ -198,17 +202,19 @@ class GameView(arcade.View):
         self.prompt.text = self.text_input
 
     def process_command(self):
+        self.show_error = False
+        self.show_grid = False
+        self.show_lrs = False
+        self.show_status = False
+
         if self.text_input == "srs":
             self.show_grid = True
-            self.show_lrs = False
-            self.show_status()
+            self.show_status = True
         elif self.text_input == "lrs":
-            self.show_grid = False
             self.show_lrs = True
-            self.draw_lrs()
+            self.show_status = True
         else:
-            self.show_grid = False
-            self.clear_status()
+            self.show_error = True
         self.text_input = ""
 
     def on_key_press(self, key, key_modifiers):
