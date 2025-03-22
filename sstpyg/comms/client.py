@@ -1,33 +1,52 @@
+import json
+
 import httpx
 
 
 class ClientHandler:
-    def __init__(self, server_address):
+    def __init__(self, server_address, role):
         """
         Server address is a combination of the host and port.
         """
         self.server_address = server_address
-        self.client = httpx.AsyncClient()
+        self.async_client = httpx.AsyncClient()
+        self.sync_client = httpx.Client()
+        self._initialize(role)
 
-    async def initialize(self, role):
+    def _initialize(self, role):
         """
         Initialize a client in the server with a specific role.
         """
-        response = await self.client.get(f"http://{self.server_address}/initialize/{role}")
+        response = self.sync_client.get(f"http://{self.server_address}/initialize/{role}")
+        try:
+            return response.json()
+        except json.JSONDecodeError:
+            pass
+
         return response.text
 
 
-    async def command(self, command_params):
+    def command(self, command_params):
         """
         Send a command to the server. Command params must be a serializable dictionary.
         """
-        response = await self.client.post(f"http://{self.server_address}/command", json=command_params)
+        response = self.sync_client.post(f"http://{self.server_address}/command", json=command_params)
+        try:
+            return response.json()
+        except json.JSONDecodeError:
+            pass
+
         return response.text
 
 
-    async def status(self):
+    async def async_status(self):
         """
         Get status from server.
         """
-        response = await self.client.get(f"http://{self.server_address}/command")
+        response = await self.async_client.get(f"http://{self.server_address}/command")
+        try:
+            return response.json()
+        except json.JSONDecodeError:
+            pass
+
         return response.text

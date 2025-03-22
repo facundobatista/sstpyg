@@ -8,6 +8,11 @@ class GameEngine:
     def command(self, command_body):
         message = f"Command received! {command_body}"
         print(message)
+
+        # tmp: fix this
+        from sstpyg.client.mocks import srs
+        message = srs()
+
         return message
 
     def get_status(self):

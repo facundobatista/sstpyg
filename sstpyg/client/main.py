@@ -3,7 +3,6 @@ from pathlib import Path
 
 import arcade
 
-from sstpyg.comms import Communications
 from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels
 from sstpyg.client.utils import abs_coords_to_sector_coords, srs_to_positions
 from sstpyg.client.mocks import srs
@@ -53,10 +52,9 @@ def get_server_info():
 class GameView(arcade.View):
     def setup(self):
         """Set up the game and initialize the variables."""
-        self.communication = ClientHandler()
-        server_address = ""
+        server_address = "192.168.111.23:8000"
         role = "capitan"
-        self.communication.initialize(server_address, role)
+        self.communication = ClientHandler(server_address, role)
         self.background_color = arcade.color.BLACK
         arcade.load_font(RESOURCES_PATH / "Okuda.otf")
 
@@ -276,7 +274,7 @@ class GameView(arcade.View):
         self.show_grs = False
 
         if self.text_input == "srs":
-            self.positions = srs()
+            self.positions = self.communication.command({"command": "src"})
             self.show_grid = True
             self.show_status = True
         elif self.text_input == "lrs":
