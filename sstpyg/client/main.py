@@ -96,7 +96,7 @@ class GameView(arcade.View):
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
         )
         self.error_message = arcade.Text(
-            "", 490, 310, LCARSColors.RED.value, 144, font_name="Okuda"
+            "", 590, 310, LCARSColors.RED.value, 144, font_name="Okuda"
         )
 
         self.stardate.text = "STARDATE 41353.2"
