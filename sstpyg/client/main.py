@@ -10,7 +10,7 @@ import arcade
 
 def get_server_info():
     return {
-        AppState.REMAINING_KLINGONS.value: 10,
+        AppState.REMAINING_KLINGONS: 10,
         AppState.REMAINING_DAYS: 10,
         AppState.SHIP_TOTAL_ENERGY: 10,
         AppState.SHIP_ENG_ENERGY: 10,
@@ -23,6 +23,20 @@ def get_server_info():
     }
 
 
+class LCARSColors(Enum):
+    BLACK = arcade.color.BLACK
+    ORANGE = arcade.color.ORANGE_PEEL
+    BLUE = arcade.color.AIR_SUPERIORITY_BLUE
+    RED = arcade.color.LAVA
+    YELLOW = arcade.color.CANARY_YELLOW
+    PURPLE = arcade.color.FRENCH_LILAC
+    PINK = arcade.color.BAKER_MILLER_PINK
+    LIGHT_BLUE = arcade.color.CADET_BLUE
+    BEIGE = arcade.color.TAN
+    WHITE = arcade.color.WHITE
+
+
+# Ejemplo de uso:
 class Division(Enum):
     COMMAND = "COMMAND"
     ENGINEERING = "ENGINEERING"
@@ -42,7 +56,20 @@ class AppState(Enum):
     SUBSYSTEM_IMPULSE = "SSI"
 
     def __str__(self):
-        return self.value
+        return AppStateLabels[self.name].value
+
+
+class AppStateLabels(Enum):
+    REMAINING_KLINGONS = "Remaining Klingons"
+    REMAINING_DAYS = "Remaining Days"
+    SHIP_TOTAL_ENERGY = "Ship Total Energy"
+    SHIP_ENG_ENERGY = "Ship Engine Energy"
+    SHIP_OK = "Ship Status"
+    SUBSYSTEM_TORPEDO = "Torpedos"
+    SUBSYSTEM_PHASERS = "Phasers"
+    SUBSYSTEM_WARP_ENGINE = "Warp Engine"
+    SUBSYSTEM_SHIELD = "Shields"
+    SUBSYSTEM_IMPULSE = "Impulse"
 
 
 WINDOW_WIDTH = 1280
@@ -73,16 +100,12 @@ class GameView(arcade.View):
             "",
             950,
             520,
-            arcade.color.MAGENTA,
-            24,
+            LCARSColors.ORANGE.value,
+            20,
             font_name="Okuda",
             width=300,
             multiline=True,
         )
-
-        # If you have sprite lists, you should create them here,
-        # and set them to None
-        #
 
     def setup(self):
         """Set up the game and initialize the variables."""
@@ -103,11 +126,11 @@ class GameView(arcade.View):
         GRID_TOP = GRID_BOTTOM + 40 * 8
         # Dibujar líneas verticales
         for x in range(GRID_LEFT, GRID_RIGHT + 1, GRID_SIZE):
-            arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, arcade.color.RED, 2)
+            arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, LCARSColors.BEIGE.value, 2)
 
         # Dibujar líneas horizontales
         for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
-            arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, arcade.color.RED, 2)
+            arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
 
     def reset(self):
         """Reset the game to the initial state."""
@@ -135,7 +158,10 @@ class GameView(arcade.View):
         need it.
         """
         self.stardate.text = "STARDATE 41353.2"
-        self.status.text = "STATUS: \n" + str(get_server_info())
+        status_text = ""
+        for key, value in get_server_info().items():
+            status_text += f"{key}: {value}\n"
+        self.status.text = "STATUS: \n" + status_text
 
     def on_key_press(self, key, key_modifiers):
         """
