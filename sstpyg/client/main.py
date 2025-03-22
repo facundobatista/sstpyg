@@ -2,6 +2,8 @@ from math import ceil
 from pathlib import Path
 
 import arcade
+import asyncio
+import threading
 
 from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels
 from sstpyg.client.utils import abs_coords_to_sector_coords, srs_to_positions
@@ -104,6 +106,14 @@ class GameView(arcade.View):
         galactic_registry = [["---" for x in range(0, 9)] for x in range(0, 9)]
 
         self.galactic_registry = galactic_registry
+        self.start_async_fetch_status_task()
+
+    def start_async_fetch_status_task(self):
+        # Ejecuta la tarea asincrónica en un hilo separado
+        threading.Thread(target=self.fetch_status_task).start()
+
+    def fetch_status_task(self):
+        self.status_info = self.communication.get_status()
 
     def generate_klingon_sprite(self, coords):
         img = RESOURCES_PATH / "klingon_logo.png"
@@ -257,7 +267,6 @@ class GameView(arcade.View):
         Normally, you'll call update() on the sprite lists that
         need it.
         """
-        self.status_info = get_server_info()
         ...
 
     def draw_prompt(self):
