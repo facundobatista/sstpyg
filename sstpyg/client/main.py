@@ -79,6 +79,12 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 WINDOW_TITLE = "LCARS Template"
 
+GRID_SIZE = 40
+GRID_LEFT = 260
+GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
+GRID_BOTTOM = 220
+GRID_TOP = GRID_BOTTOM + 40 * 8
+
 
 class GameView(arcade.View):
     def setup(self):
@@ -125,20 +131,34 @@ class GameView(arcade.View):
         # Klingon ships
         self.klingon_ships = arcade.SpriteList()
 
+        # Klingon ships
+        self.starbases = arcade.SpriteList()
+
     def generate_klingon_sprite(self, coords):
         img = "klingon_logo.png"
         klingon_sprite = arcade.Sprite(img, scale=0.040)
         klingon_sprite.position = coords
 
-        return klingon_sprite
+        self.klingon_ships.append(klingon_sprite)
+
+    def generate_starbases_sprite(self, coords):
+        img = "starfleet_logo.png"
+        starbase_sprite = arcade.Sprite(img, scale=0.040)
+        starbase_sprite.position = coords
+
+        self.starbases.append(starbase_sprite)
+
+    def place_sprites(self, sprite_method, set_of_coords):
+        for coords in set_of_coords:
+            actor_sprite = sprite_method(
+                (
+                    GRID_LEFT + coords[0] * GRID_SIZE - 20,
+                    GRID_BOTTOM + coords[1] * GRID_SIZE - 20,
+                )
+            )
 
     def draw_map_grid(self):
         """Draw the map grid."""
-        GRID_SIZE = 40
-        GRID_LEFT = 260
-        GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
-        GRID_BOTTOM = 220
-        GRID_TOP = GRID_BOTTOM + 40 * 8
         # Dibujar líneas verticales
         for x in range(GRID_LEFT, GRID_RIGHT + 1, GRID_SIZE):
             arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, LCARSColors.BEIGE.value, 2)
@@ -147,14 +167,11 @@ class GameView(arcade.View):
         for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
             arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
 
-        for coords in get_server_info()[AppState.KLINGON_SHIPS_COORDS]:
-            klingon_sprite = self.generate_klingon_sprite(
-                (
-                    GRID_LEFT + coords[0] * GRID_SIZE - 20,
-                    GRID_BOTTOM + coords[1] * GRID_SIZE - 20,
-                )
-            )
-            self.klingon_ships.append(klingon_sprite)
+        # Mostrar naves klingon
+        self.place_sprites(
+            self.generate_klingon_sprite,
+            get_server_info()[AppState.KLINGON_SHIPS_COORDS],
+        )
 
     def draw_lrs(self):
         """Draw the LRS."""
