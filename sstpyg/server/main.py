@@ -18,4 +18,9 @@ class GameEngine:
     def get_status(self):
         message = "Get status received!"
         print(message)
+
+        # tmp: fix this
+        from sstpyg.client.mocks import get_server_info
+        message = get_server_info()
+
         return message
