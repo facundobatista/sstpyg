@@ -41,13 +41,40 @@ def get_server_info():
         AppState.KLINGON_SHIPS_COORDS: [
             (1, 3),
             (6, 6),
-            (9, 9),
+            (8, 8),
             (1, 8),
-        ],  # Lets use 64x64 and deduce quadrants
-        AppState.ENTERPRISE_POSITION: (1, 1),  # 64x64
+        ],
+        AppState.ENTERPRISE_POSITION: (1, 1),
+        AppState.ENTERPRISE_QUADRANT: (1, 1),
     }
 
 
+<<<<<<< Updated upstream
+=======
+def srs():
+    ls = [
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+        ["K", "S", "B", "E", "", "", "", ""],
+    ]
+    srs_list = []
+    row_list = []
+    possible_ships = ["K", "S", "", "B", "E"]
+
+    for i in range(0, 8):
+        for j in range(0, 8):
+            row_list.append(random.choice(possible_ships))
+
+        srs_list.append(row_list)
+    return srs_list
+
+
+>>>>>>> Stashed changes
 class GameView(arcade.View):
     def setup(self):
         """Set up the game and initialize the variables."""
@@ -96,6 +123,11 @@ class GameView(arcade.View):
         self.status_info = {}
         self.positions = []
 
+        galactic_registry_row = ['' for x in range(0,9)]
+        galactic_registry = [galactic_registry_row for x in range(0,9)]
+
+        self.galactic_registry = galactic_registry
+
     def generate_klingon_sprite(self, coords):
         img = RESOURCES_PATH / "klingon_logo.png"
         klingon_sprite = arcade.Sprite(img, scale=0.040)
@@ -124,22 +156,15 @@ class GameView(arcade.View):
 
         self.space_objects.append(star_sprite)
 
-    def place_sprites(self, sprite_method, set_of_coords, current_quadrant):
+    def place_sprites(self, sprite_method, set_of_coords):
         for coords in set_of_coords:
-            coord_quadrant = self.get_quadrant(coords)
-            if coord_quadrant == current_quadrant:
-                sector_coords = abs_coords_to_sector_coords(coords)
-                sprite_method(
-                    (
-                        GRID_LEFT + sector_coords[0] * GRID_SIZE - (GRID_SIZE / 2),
-                        GRID_TOP - sector_coords[1] * GRID_SIZE + (GRID_SIZE / 2),
-                    )
+            sector_coords = abs_coords_to_sector_coords(coords)
+            sprite_method(
+                (
+                    GRID_LEFT + sector_coords[0] * GRID_SIZE - (GRID_SIZE / 2),
+                    GRID_TOP - sector_coords[1] * GRID_SIZE + (GRID_SIZE / 2),
                 )
-
-    def get_quadrant(self, coords):
-        x = coords[0]
-        y = coords[1]
-        return (ceil(x / 8), ceil(y / 8))
+            )
 
     def draw_map_grid(self):
         """Draw the map grid."""
@@ -148,6 +173,12 @@ class GameView(arcade.View):
         k_positions, e_positions, s_positions, b_positions = srs_to_positions(
             self.positions
         )
+        n_klingons = len(k_positions)
+        n_starbases = len(b_positions)
+        n_stars = len(s_positions)
+        summary = str(n_klingons) + str(n_starbases) + str(n_starbases)
+        current_quadrant = self.status_info[AppState.ENTERPRISE_QUADRANT]
+        self.galactic_registry[current_quadrant[0], current_quadrant[1]] = summary
 
         for x in range(GRID_LEFT, GRID_RIGHT + 1, GRID_SIZE):
             arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, LCARSColors.BEIGE.value, 2)
@@ -156,29 +187,24 @@ class GameView(arcade.View):
         for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
             arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
 
-        quadrant = self.get_quadrant(self.status_info[AppState.ENTERPRISE_POSITION])
         # Mostrar naves klingon
         self.space_objects.clear()
 
         self.place_sprites(
             self.generate_klingon_sprite,
             k_positions,
-            quadrant,
         )
         self.place_sprites(
             self.generate_enterprise_sprite,
             e_positions,
-            quadrant,
         )
         self.place_sprites(
             self.generate_starbase_sprite,
             b_positions,
-            quadrant,
         )
         self.place_sprites(
             self.generate_star_sprite,
             s_positions,
-            quadrant,
         )
 
     def draw_lrs(self):
