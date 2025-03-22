@@ -35,8 +35,12 @@ def get_server_info():
         AppState.SUBSYSTEM_WARP_ENGINE: 20,
         AppState.SUBSYSTEM_SHIELD: 50,
         AppState.SUBSYSTEM_IMPULSE: 80,
-        AppState.KLINGON_SHIPS_COORDS: [(1, 3), (6, 6), (9, 9)], # Lets use 64x64 and deduce quadrants
-        AppState.ENTERPRISE_POSITION: (32, 12) # 64x64
+        AppState.KLINGON_SHIPS_COORDS: [
+            (1, 3),
+            (6, 6),
+            (9, 9),
+        ],  # Lets use 64x64 and deduce quadrants
+        AppState.ENTERPRISE_POSITION: (1, 1),  # 64x64
     }
 
 
@@ -101,7 +105,7 @@ class GameView(arcade.View):
         starbase_sprite.position = coords
 
         self.starbases.append(starbase_sprite)
-    
+
     def quadrant_to_sector(self, coords):
         return (coords[0] % 8, coords[1] % 8)
 
@@ -116,7 +120,7 @@ class GameView(arcade.View):
                         GRID_TOP - sector_coords[1] * GRID_SIZE + (GRID_SIZE / 2),
                     )
                 )
-    
+
     def get_quadrant(self, coords):
         x = coords[0]
         y = coords[1]
@@ -137,7 +141,7 @@ class GameView(arcade.View):
         self.place_sprites(
             self.generate_klingon_sprite,
             get_server_info()[AppState.KLINGON_SHIPS_COORDS],
-            quadrant
+            quadrant,
         )
 
     def draw_lrs(self):
