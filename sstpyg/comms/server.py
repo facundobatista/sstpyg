@@ -1,5 +1,13 @@
+import json
 import socket
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from functools import wraps
+
+from sstpyg.server.main import GameEngine
+
+
+HOST = "0.0.0.0"  # Listen on all available network interfaces
+PORT = 8000
 
 
 def get_local_ip():
@@ -8,50 +16,65 @@ def get_local_ip():
         return s.getsockname()[0]
 
 
-class ServerHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == "/ping":
+def prepare_response(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        try:
+            message = func(self, *args, **kwargs)
             self.send_response(200)
+        except NotFoundError:
+            message = "Not Found"
+            self.send_response(404)
+
+        except Exception:
+            message = "Internal Server Error"
+            self.send_response(500)
+
+        if isinstance(message, (dict, list)):
+            message = json.dumps(message)
+            self.send_header("Content-type", "application/json")
+        else:
             self.send_header("Content-type", "text/plain")
-            self.end_headers()
-            self.wfile.write(b"Pong")
+        self.end_headers()
+        self.wfile.write(message.encode())
+    return wrapper
+
+
+class NotFoundError(Exception):
+    pass
+
+
+class ServerHandler(BaseHTTPRequestHandler):
+
+    def __init__(self, *args, **kwargs):
+        self.game_engine = GameEngine()
+        super().__init__(*args, **kwargs)
+
+    @prepare_response
+    def do_GET(self):
+        if self.path.startswith("/initialize/"):
+            role = self.path.split("/initialize/")[-1]
+            response = self.game_engine.initialize(role)
+            return response
 
         elif self.path == "/status":
-            # status = game_logic.get_status()
-            self.send_response(200)
-            self.send_header("Content-type", "text/plain")
-            self.end_headers()
-            self.wfile.write(b"result of get_status()")
+            return self.game_engine.get_status()
 
         else:
-            self.send_response(404)
-            self.send_header("Content-type", "text/plain")
-            self.end_headers()
-            self.wfile.write(b"Not Found")
+            raise NotFoundError()
 
+    @prepare_response
     def do_POST(self):
         if self.path == "/command":
-            # game_logic.command()
-            content_length = int(self.headers["Content-Length"])
-            post_data = self.rfile.read(content_length)
-            print(f"Received move: {post_data}")
-            self.send_response(200)
-            self.send_header("Content-type", "text/plain")
-            self.end_headers()
-            self.wfile.write(b"Command received")
+            content_length = int(self.headers.get("Content-Length", 0))
+            command_body = json.loads(self.rfile.read(content_length))
+            return  self.game_engine.command(command_body)
 
         else:
-            self.send_response(404)
-            self.send_header("Content-type", "text/plain")
-            self.end_headers()
-            self.wfile.write(b"Not Found")
+            raise NotFoundError()
 
-
-host = "0.0.0.0"  # Listen on all available network interfaces
-
-port = 8000
 
 def run_server():
-    server = HTTPServer((host, port), ServerHandler)
-    print(f"Serving on http://{get_local_ip()}:{port}")
+    server = HTTPServer((HOST, PORT), ServerHandler)
+    print(f"Serving on http://{get_local_ip()}:{PORT}")
     server.serve_forever()

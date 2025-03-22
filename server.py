@@ -1,3 +1,3 @@
-from sstpyg.server import main
+from sstpyg.comms.server import run_server
 
-main.run()
+run_server()

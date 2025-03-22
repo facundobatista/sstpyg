@@ -1,5 +1,3 @@
-import asyncio
-import sys
 import httpx
 
 
@@ -11,28 +9,17 @@ class ClientHandler:
         self.server_address = server_address
         self.client = httpx.AsyncClient()
 
-    async def ping(self):
+    async def initialize(self, role):
         """
         Send a GET request to the server.
         """
-        response = await self.client.get(f"http://{self.server_address}/ping")
+        response = await self.client.get(f"http://{self.server_address}/initialize/{role}")
         return response.text
 
 
-    async def command(self):
+    async def command(self, command_params):
         """
         Send a POST request to the server.
         """
-        response = await self.client.post(f"http://{self.server_address}/command")
+        response = await self.client.post(f"http://{self.server_address}/command", json=command_params)
         return response.text
-
-
-
-if __name__ == "__main__":
-    server_address = sys.argv[1]
-    print(f"Received parameter: {server_address}")
-
-    client = ClientHandler(server_address=server_address)
-    print(asyncio.run(client.ping()))
-    print(asyncio.run(client.command()))
-
