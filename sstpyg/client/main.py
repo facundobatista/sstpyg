@@ -72,7 +72,7 @@ class GameView(arcade.View):
         self.status = arcade.Text(
             "",
             950,
-            550,
+            520,
             arcade.color.MAGENTA,
             24,
             font_name="Okuda",
@@ -95,6 +95,20 @@ class GameView(arcade.View):
         self.bg_sprite.position = WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2
         self.sprites.append(self.bg_sprite)
 
+    def draw_map_grid(self):
+        GRID_SIZE = 40
+        GRID_LEFT = 260
+        GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
+        GRID_BOTTOM = 220
+        GRID_TOP = GRID_BOTTOM + 40 * 8
+        # Dibujar líneas verticales
+        for x in range(GRID_LEFT, GRID_RIGHT + 1, GRID_SIZE):
+            arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, arcade.color.RED, 2)
+
+        # Dibujar líneas horizontales
+        for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
+            arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, arcade.color.RED, 2)
+
     def reset(self):
         """Reset the game to the initial state."""
         # Do changes needed to restart the game here if you want to support that
@@ -111,6 +125,7 @@ class GameView(arcade.View):
         self.sprites.draw()
         self.stardate.draw()
         self.status.draw()
+        self.draw_map_grid()
         # Call draw() on all your sprite lists below
 
     def on_update(self, delta_time):
