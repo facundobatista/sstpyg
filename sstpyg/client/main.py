@@ -98,6 +98,9 @@ class GameView(arcade.View):
         self.stardate = arcade.Text(
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
         )
+        self.error_message = arcade.Text(
+            "", 590, 310, LCARSColors.RED.value, 144, font_name="Okuda"
+        )
 
         self.stardate.text = "STARDATE 41353.2"
         self.prompt = arcade.Text(
@@ -173,6 +176,10 @@ class GameView(arcade.View):
         for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
             arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
 
+    def draw_error_message(self):
+        self.error_message.text = "ERROR"
+        self.error_message.draw()
+
     def reset(self):
         """Reset the game to the initial state."""
         # Do changes needed to restart the game here if you want to support that
@@ -196,6 +203,9 @@ class GameView(arcade.View):
             self.draw_lrs()
         if self.show_status:
             self.draw_status()
+        if self.show_error:
+            self.draw_error_message()
+        # Call draw() on all your sprite lists below
 
     def on_update(self, delta_time):
         """
@@ -211,9 +221,6 @@ class GameView(arcade.View):
             status_text += f"{key}: {value}\n"
         self.status.text = "STATUS \n" + status_text
         self.status.draw()
-
-    def clear_status(self):
-        self.status.text = ""
 
     def show_text(self):
         self.prompt.text = self.text_input
