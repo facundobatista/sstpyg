@@ -80,6 +80,7 @@ class GameView(arcade.View):
         self.text_input = ""
         self.show_grid = False
         self.show_lrs = False
+        self.show_grs = False
         self.show_status = False
         self.show_error = False
 
@@ -97,7 +98,7 @@ class GameView(arcade.View):
         self.status_info = {}
         self.positions = []
 
-        galactic_registry = [['' for x in range(0,9)] for x in range(0,9)]
+        galactic_registry = [["---" for x in range(0, 9)] for x in range(0, 9)]
 
         self.galactic_registry = galactic_registry
 
@@ -152,7 +153,9 @@ class GameView(arcade.View):
         summary = str(n_klingons) + str(n_starbases) + str(n_stars)
         current_quadrant = self.status_info[AppState.ENTERPRISE_QUADRANT]
 
-        self.galactic_registry[current_quadrant[1] - 1][current_quadrant[0] - 1] = summary
+        self.galactic_registry[current_quadrant[1] - 1][current_quadrant[0] - 1] = (
+            summary
+        )
 
         for x in range(GRID_LEFT, GRID_RIGHT + 1, GRID_SIZE):
             arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, LCARSColors.BEIGE.value, 2)
@@ -193,6 +196,19 @@ class GameView(arcade.View):
                 font_name="Okuda",
             )
 
+    def draw_grs(self):
+        """Draw the LRS."""
+        for i in range(9):
+            for j in range(9):
+                arcade.draw_text(
+                    self.galactic_registry[i][j],
+                    340 + i * 50,
+                    462 - j * 50,
+                    LCARSColors.BEIGE.value,
+                    40,
+                    font_name="Okuda",
+                )
+
     def draw_error_message(self):
         """Draw error message."""
         self.error_message.text = "ERROR"
@@ -224,6 +240,8 @@ class GameView(arcade.View):
             self.space_objects.draw()
         if self.show_lrs:
             self.draw_lrs()
+        if self.show_grs:
+            self.draw_grs()
         if self.show_status:
             self.draw_status()
         if self.show_error:
@@ -250,6 +268,7 @@ class GameView(arcade.View):
         self.show_grid = False
         self.show_lrs = False
         self.show_status = False
+        self.show_grs = False
 
         if self.text_input == "srs":
             self.positions = srs()
@@ -257,6 +276,9 @@ class GameView(arcade.View):
             self.show_status = True
         elif self.text_input == "lrs":
             self.show_lrs = True
+            self.show_status = True
+        elif self.text_input == "grs":
+            self.show_grs = True
             self.show_status = True
         else:
             self.show_error = True
