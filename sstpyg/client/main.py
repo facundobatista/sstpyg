@@ -20,7 +20,7 @@ def get_server_info():
         AppState.SUBSYSTEM_WARP_ENGINE: 20,
         AppState.SUBSYSTEM_SHIELD: 50,
         AppState.SUBSYSTEM_IMPULSE: 80,
-        AppState.KLINGON_SHIPS_COORDS: [(1,3), (6,6)]
+        AppState.KLINGON_SHIPS_COORDS: [(1, 3), (6, 6)],
     }
 
 
@@ -133,7 +133,7 @@ class GameView(arcade.View):
         self.bg_sprite = arcade.Sprite(img)
         self.bg_sprite.position = WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2
         self.background.append(self.bg_sprite)
-    
+
         # Klingon ships
         self.klingon_ships = arcade.SpriteList()
 
@@ -159,7 +159,12 @@ class GameView(arcade.View):
             arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
 
         for coords in get_server_info()[AppState.KLINGON_SHIPS_COORDS]:
-            klingon_sprite = self.generate_klingon_sprite((GRID_LEFT + coords[0]*GRID_SIZE - 20, GRID_BOTTOM + coords[1]*GRID_SIZE -20))
+            klingon_sprite = self.generate_klingon_sprite(
+                (
+                    GRID_LEFT + coords[0] * GRID_SIZE - 20,
+                    GRID_BOTTOM + coords[1] * GRID_SIZE - 20,
+                )
+            )
             self.klingon_ships.append(klingon_sprite)
 
     def draw_lrs(self):
@@ -168,13 +173,16 @@ class GameView(arcade.View):
         GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
         GRID_BOTTOM = 220
         GRID_TOP = GRID_BOTTOM + 40 * 8
-        # Dibujar líneas verticales
-        for x in range(GRID_LEFT, GRID_RIGHT + 1, GRID_SIZE):
-            arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, LCARSColors.BEIGE.value, 2)
 
-        # Dibujar líneas horizontales
-        for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
-            arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
+        for i in range(3):
+            arcade.draw_text(
+                "000 001 002",
+                400,
+                432 - i * 80,
+                LCARSColors.BEIGE.value,
+                70,
+                font_name="Okuda",
+            )
 
     def draw_error_message(self):
         self.error_message.text = "ERROR"
