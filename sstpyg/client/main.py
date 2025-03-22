@@ -1,21 +1,25 @@
-# from sstpyg.comms import Communications
-
-# def run():
-#    print("CLIENT!!")
-#    print("comms?", Communications)
-#
 import arcade
-from constants import LCARSColors, Division, AppState, AppStateLabels
+from sstpyg.comms import Communications
+from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels
+
 
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
-WINDOW_TITLE = "LCARS Template"
+WINDOW_TITLE = "SSTPYG"
 
 GRID_SIZE = 40
 GRID_LEFT = 260
 GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
 GRID_BOTTOM = 220
 GRID_TOP = GRID_BOTTOM + 40 * 8
+
+from pathlib import Path
+
+# Obtener el base path del archivo actual
+BASE_PATH = Path(__file__).parent
+
+# Hacer join con la carpeta "resources"
+RESOURCES_PATH = BASE_PATH / "resources"
 
 
 def get_server_info():
@@ -38,7 +42,7 @@ class GameView(arcade.View):
     def setup(self):
         """Set up the game and initialize the variables."""
         self.background_color = arcade.color.BLACK
-        arcade.load_font("Okuda.otf")
+        arcade.load_font(RESOURCES_PATH / "Okuda.otf")
 
         self.stardate = arcade.Text(
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
@@ -71,7 +75,7 @@ class GameView(arcade.View):
         # Create the sprite lists
         self.background = arcade.SpriteList()
 
-        img = "lcars.jpg"
+        img = RESOURCES_PATH / "lcars.jpg"
         self.bg_sprite = arcade.Sprite(img)
         self.bg_sprite.position = WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2
         self.background.append(self.bg_sprite)
@@ -83,14 +87,14 @@ class GameView(arcade.View):
         self.starbases = arcade.SpriteList()
 
     def generate_klingon_sprite(self, coords):
-        img = "klingon_logo.png"
+        img = RESOURCES_PATH / "klingon_logo.png"
         klingon_sprite = arcade.Sprite(img, scale=0.040)
         klingon_sprite.position = coords
 
         self.klingon_ships.append(klingon_sprite)
 
     def generate_starbases_sprite(self, coords):
-        img = "starfleet_logo.png"
+        img = RESOURCES_PATH / "starfleet_logo.png"
         starbase_sprite = arcade.Sprite(img, scale=0.040)
         starbase_sprite.position = coords
 
@@ -224,7 +228,7 @@ class GameView(arcade.View):
         pass
 
 
-def main():
+def run():
     """Main function"""
     # Create a window class. This is what actually shows up on screen
     window = arcade.Window(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE)
@@ -240,4 +244,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()
