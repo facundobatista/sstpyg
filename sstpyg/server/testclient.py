@@ -1,6 +1,7 @@
 import cmd
 import os
 import sys
+import pprint
 
 sys.path.append(os.getcwd())
 
@@ -33,6 +34,8 @@ class TestShell(cmd.Cmd):
     def do_srs(self, arg):
         print("==== real")
         self.engine.command("srs")
+    def do_state(self, arg):
+        pprint.pprint(self.engine.get_state())
 
 
 if __name__ == '__main__':
