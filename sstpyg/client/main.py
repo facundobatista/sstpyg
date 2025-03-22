@@ -49,32 +49,6 @@ def get_server_info():
     }
 
 
-<<<<<<< Updated upstream
-=======
-def srs():
-    ls = [
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-    ]
-    srs_list = []
-    row_list = []
-    possible_ships = ["K", "S", "", "B", "E"]
-
-    for i in range(0, 8):
-        for j in range(0, 8):
-            row_list.append(random.choice(possible_ships))
-
-        srs_list.append(row_list)
-    return srs_list
-
-
->>>>>>> Stashed changes
 class GameView(arcade.View):
     def setup(self):
         """Set up the game and initialize the variables."""
