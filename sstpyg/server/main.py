@@ -1,9 +1,13 @@
-from sstpyg.comms import Communications
+import asyncio
 import random
+
+from sstpyg.comms import Communications
+
 
 def run():
     print("SERVER!!")
     print("comms?", Communications)
+
 
 class Engine:
     cant_klingon_total = random.randint(10, 20)
@@ -16,7 +20,6 @@ class Engine:
 
     def __init__(self):
         self.mapa = []
-        cuadrante = []
         self.estado = {
             "remaining_energy": self.total_energy,
             "remaining_days": self.tiempo_total,
@@ -29,11 +32,10 @@ class Engine:
             "subs_shields": 1,
         }
         enterprise = False
-        print("enterprise")
         while len(self.mapa) < 8:
             cx = []
             while len(cx) < 8:
-                cy =[]
+                cy = []
                 while len(cy) < 8:
                     ox = []
                     while len(ox) < 8:
@@ -67,7 +69,7 @@ class Engine:
             if r_ox[num_random] == "---":
                 r_ox[num_random] = "starbase"
 
-        while enterprise == False:
+        while not enterprise:
             print("while")
             r_cx_num = random.randint(0, 7)
             r_cx = self.mapa[r_cx_num]
@@ -78,25 +80,41 @@ class Engine:
             num_random = random.randint(0, 7)
             if r_ox[num_random] == "---":
                 r_ox[num_random] = "enterprise"
-                self.enterprise_loc = ((r_cx_num, r_cy_num),(r_ox_num, num_random))
+                self.enterprise_loc = ((r_cx_num, r_cy_num), (r_ox_num, num_random))
                 print("enterprise True")
                 enterprise = True
 
-    def commands(command):
-        if coomand == "galaxy":
-            cmd_galaxy()
-        if command == "srs":
-            cmd_srs()
+    async def init(self):
+        self.loop = asyncio.get_event_loop()
+        self.repeat(5, self.klingon_ai)
+        self.repeat(1, self.time_goes_by)
 
-    def cmd_galaxy(self):
+    def repeat(self, delay, func, first=True):
+        loop = asyncio.get_event_loop()
+        if not first:
+            func()
+        loop.call_later(delay, self.repeat, delay, func, False)
+
+    def klingon_ai(self):
+        print("========== klingon attack!!")
+
+    def time_goes_by(self):
+        self.estado["remaining_energy"] = self.estado["remaining_energy"] - 1
+
+    async def command(self, command):
+        if command == "galaxy":
+            await self.cmd_galaxy()
+        if command == "srs":
+            await self.cmd_srs()
+
+    async def cmd_galaxy(self):
         print(self.mapa)
 
-    def cmd_srs(self):
+    async def cmd_srs(self):
         cuadrante = self.enterprise_loc[0]
         cuadrante_x = cuadrante[0]
         cuadrante_y = cuadrante[1]
-        #breakpoint()
         print(self.mapa[cuadrante_x][cuadrante_y])
 
-    def get_state(self):
+    async def get_state(self):
         return self.estado
