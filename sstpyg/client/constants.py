@@ -34,6 +34,7 @@ class AppState(Enum):
     SUBSYSTEM_SHIELD = "SSS"
     SUBSYSTEM_IMPULSE = "SSI"
     KLINGON_SHIPS_COORDS = "KSC"
+    ENTERPRISE_POSITION = "EPOS"
 
     def __str__(self):
         return AppStateLabels[self.name].value
@@ -51,6 +52,7 @@ class AppStateLabels(Enum):
     SUBSYSTEM_SHIELD = "Shields"
     SUBSYSTEM_IMPULSE = "Impulse"
     KLINGON_SHIPS_COORDS = "KSC"
+    ENTERPRISE_POSITION = "Enterprise"
 
 
 WINDOW_WIDTH = 1280

@@ -1,6 +1,9 @@
 import arcade
 from sstpyg.comms import Communications
 from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels
+from math import ceil
+
+from pathlib import Path
 
 
 WINDOW_WIDTH = 1280
@@ -11,9 +14,7 @@ GRID_SIZE = 40
 GRID_LEFT = 260
 GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
 GRID_BOTTOM = 220
-GRID_TOP = GRID_BOTTOM + 40 * 8
-
-from pathlib import Path
+GRID_TOP = GRID_BOTTOM + GRID_SIZE * 8
 
 # Obtener el base path del archivo actual
 BASE_PATH = Path(__file__).parent
@@ -34,7 +35,8 @@ def get_server_info():
         AppState.SUBSYSTEM_WARP_ENGINE: 20,
         AppState.SUBSYSTEM_SHIELD: 50,
         AppState.SUBSYSTEM_IMPULSE: 80,
-        AppState.KLINGON_SHIPS_COORDS: [(1, 3), (6, 6)],
+        AppState.KLINGON_SHIPS_COORDS: [(1, 3), (6, 6), (9, 9)], # Lets use 64x64 and deduce quadrants
+        AppState.ENTERPRISE_POSITION: (32, 12) # 64x64
     }
 
 
@@ -99,15 +101,26 @@ class GameView(arcade.View):
         starbase_sprite.position = coords
 
         self.starbases.append(starbase_sprite)
+    
+    def quadrant_to_sector(self, coords):
+        return (coords[0] % 8, coords[1] % 8)
 
-    def place_sprites(self, sprite_method, set_of_coords):
+    def place_sprites(self, sprite_method, set_of_coords, current_quadrant):
         for coords in set_of_coords:
-            actor_sprite = sprite_method(
-                (
-                    GRID_LEFT + coords[0] * GRID_SIZE - 20,
-                    GRID_BOTTOM + coords[1] * GRID_SIZE - 20,
+            coord_quadrant = self.get_quadrant(coords)
+            if coord_quadrant == current_quadrant:
+                sector_coords = self.quadrant_to_sector(coords)
+                sprite_method(
+                    (
+                        GRID_LEFT + sector_coords[0] * GRID_SIZE - (GRID_SIZE / 2),
+                        GRID_TOP - sector_coords[1] * GRID_SIZE + (GRID_SIZE / 2),
+                    )
                 )
-            )
+    
+    def get_quadrant(self, coords):
+        x = coords[0]
+        y = coords[1]
+        return (ceil(x / 8), ceil(y / 8))
 
     def draw_map_grid(self):
         """Draw the map grid."""
@@ -119,10 +132,12 @@ class GameView(arcade.View):
         for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
             arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
 
+        quadrant = self.get_quadrant(get_server_info()[AppState.ENTERPRISE_POSITION])
         # Mostrar naves klingon
         self.place_sprites(
             self.generate_klingon_sprite,
             get_server_info()[AppState.KLINGON_SHIPS_COORDS],
+            quadrant
         )
 
     def draw_lrs(self):
