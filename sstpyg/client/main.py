@@ -1,12 +1,12 @@
-import random
+from pathlib import Path
 
 import arcade
+
 from sstpyg.comms import Communications
 from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels
 from math import ceil
 from sstpyg.client.utils import abs_coords_to_sector_coords, srs_to_positions
-
-from pathlib import Path
+from sstpyg.client.mocks import srs
 
 
 WINDOW_WIDTH = 1280
@@ -46,30 +46,6 @@ def get_server_info():
         ],  # Lets use 64x64 and deduce quadrants
         AppState.ENTERPRISE_POSITION: (1, 1),  # 64x64
     }
-
-
-def srs():
-    ls = [
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-        ["K", "S", "B", "E", "", "", "", ""],
-    ]
-    srs_list = []
-    row_list = []
-    possible_ships = ["K", "S", "", "B", "E"]
-
-    for i in range(0, 8):
-        for j in range(0, 8):
-            row_list.append(random.choice(possible_ships))
-
-        srs_list.append(row_list)
-    print(srs_list)
-    return srs_list
 
 
 class GameView(arcade.View):
