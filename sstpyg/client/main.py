@@ -106,14 +106,18 @@ class GameView(arcade.View):
         galactic_registry = [["---" for x in range(0, 9)] for x in range(0, 9)]
 
         self.galactic_registry = galactic_registry
-        self.start_async_fetch_status_task()
+        self.start_fetch_status_task()
 
-    def start_async_fetch_status_task(self):
+    def start_fetch_status_task(self):
         # Ejecuta la tarea asincrónica en un hilo separado
         threading.Thread(target=self.fetch_status_task).start()
 
     def fetch_status_task(self):
-        self.status_info = self.communication.get_status()
+        while True:
+            self.status_info = self.communication.get_status()
+            import time
+
+            time.sleep(3)
 
     def generate_klingon_sprite(self, coords):
         img = RESOURCES_PATH / "klingon_logo.png"
@@ -164,7 +168,7 @@ class GameView(arcade.View):
         n_starbases = len(b_positions)
         n_stars = len(s_positions)
         summary = str(n_klingons) + str(n_starbases) + str(n_stars)
-        current_quadrant = self.status_info[AppState.ENTERPRISE_QUADRANT]
+        current_quadrant = self.status_info[AppState.ENTERPRISE_QUADRANT.value]
 
         self.galactic_registry[current_quadrant[1] - 1][current_quadrant[0] - 1] = (
             summary

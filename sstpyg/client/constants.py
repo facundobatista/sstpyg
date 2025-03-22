@@ -37,9 +37,6 @@ class AppState(Enum):
     ENTERPRISE_POSITION = "EPOS"
     ENTERPRISE_QUADRANT = "EQUAD"
 
-    def __str__(self):
-        return AppStateLabels[self.name].value
-
 
 class AppStateLabels(Enum):
     REMAINING_KLINGONS = "Remaining Klingons"
