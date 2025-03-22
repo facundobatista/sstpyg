@@ -64,8 +64,9 @@ def srs():
     possible_ships = ["K", "S", "", "B", "E"]
 
     for i in range(0, 8):
+        ship = random.choice(possible_ships)
         for j in range(0, 8):
-            row_list.append(random.choice(possible_ships))
+            row_list.append(ship)
 
         srs_list.append(row_list)
     print(srs_list)
