@@ -1,5 +1,16 @@
-from sstpyg.comms import Communications
+class GameEngine:
+    def initialize(self, role):
+        message = f"Initialize {role} received!"
+        print(message)
 
-def run():
-    print("SERVER!!")
-    print("comms?", Communications)
+        return message
+
+    def command(self, command_body):
+        message = f"Command received! {command_body}"
+        print(message)
+        return message
+
+    def get_status(self):
+        message = "Get status received!"
+        print(message)
+        return message

@@ -1,12 +1,13 @@
+from math import ceil
 from pathlib import Path
 
 import arcade
 
 from sstpyg.comms import Communications
 from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels
-from math import ceil
 from sstpyg.client.utils import abs_coords_to_sector_coords, srs_to_positions
 from sstpyg.client.mocks import srs
+from sstpyg.comms.client import ClientHandler
 
 
 WINDOW_WIDTH = 1280
@@ -52,6 +53,10 @@ def get_server_info():
 class GameView(arcade.View):
     def setup(self):
         """Set up the game and initialize the variables."""
+        self.communication = ClientHandler()
+        server_address = ""
+        role = "capitan"
+        self.communication.initialize(server_address, role)
         self.background_color = arcade.color.BLACK
         arcade.load_font(RESOURCES_PATH / "Okuda.otf")
 
@@ -322,7 +327,3 @@ def run():
     game.setup()
     # Start the arcade game loop
     arcade.run()
-
-
-if __name__ == "__main__":
-    run()
