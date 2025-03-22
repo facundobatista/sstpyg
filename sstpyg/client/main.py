@@ -111,6 +111,7 @@ class GameView(arcade.View):
             multiline=True,
         )
         self.text_input = ""
+        self.show_grid = False
 
     def setup(self):
         """Set up the game and initialize the variables."""
@@ -154,7 +155,8 @@ class GameView(arcade.View):
         self.stardate.draw()
         self.status.draw()
         self.prompt.draw()
-        self.draw_map_grid()
+        if self.show_grid:
+            self.draw_map_grid()
         # Call draw() on all your sprite lists below
 
     def on_update(self, delta_time):
@@ -169,8 +171,15 @@ class GameView(arcade.View):
             status_text += f"{key}: {value}\n"
         self.status.text = "STATUS \n" + status_text
 
-    def procesar_texto(self, texto):
-        self.prompt.text = texto
+    def show_text(self):
+        self.prompt.text = self.text_input
+
+    def process_command(self):
+        if self.text_input == "srs":
+            self.show_grid = True
+        else:
+            self.show_grid = False
+        self.text_input = ""
 
     def on_key_press(self, key, key_modifiers):
         """
@@ -183,12 +192,12 @@ class GameView(arcade.View):
         if key == arcade.key.ESCAPE:
             arcade.close_window()
         if key == arcade.key.RETURN:
-            self.text_input = ""
+            self.process_command()
         elif key == arcade.key.BACKSPACE:
             self.text_input = self.text_input[:-1]
         else:
             self.text_input += chr(key)
-        self.procesar_texto(self.text_input)
+        self.show_text()
 
     def on_key_release(self, key, key_modifiers):
         """
