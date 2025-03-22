@@ -17,17 +17,44 @@ class LCARSColors(Enum):
 
 # Ejemplo de uso:
 class Division(Enum):
-    COMMAND = "COMMAND"
+    COMMAND = "CAPTAIN"
     ENGINEERING = "ENGINEERING"
     TACTICAL = "TACTICAL"
+
+    @classmethod
+    def get_statuses(cls, role):
+        mapping = {
+            cls.COMMAND.value.lower():[
+                AppState.REMAINING_KLINGONS,
+                AppState.REMAINING_DAYS,
+                AppState.SHIP_TOTAL_ENERGY,
+                AppState.SHIP_OK
+            ],
+            cls.ENGINEERING.value.lower():[
+                AppState.SHIP_ENG_ENERGY,
+                AppState.SHIP_TOTAL_ENERGY,
+                AppState.SUBSYSTEM_TORPEDO,
+                AppState.SUBSYSTEM_PHASERS,
+                AppState.SUBSYSTEM_WARP_ENGINE,
+                AppState.SUBSYSTEM_SHIELD,
+                AppState.SUBSYSTEM_IMPULSE,
+                AppState.SHIP_OK
+            ],
+            cls.TACTICAL.value.lower():[
+                AppState.SUBSYSTEM_TORPEDO,
+                AppState.SUBSYSTEM_PHASERS,
+                AppState.SUBSYSTEM_SHIELD,
+            ],
+        }
+        return mapping[role]
 
 
 class AppState(Enum):
     REMAINING_KLINGONS = "RMK"
     REMAINING_DAYS = "RMD"
     SHIP_TOTAL_ENERGY = "STE"
-    SHIP_ENG_ENERGY = "SEE"
     SHIP_OK = "SOO"
+    SHIP_ENG_ENERGY = "SEE"
     SUBSYSTEM_TORPEDO = "SST"
     SUBSYSTEM_PHASERS = "SSP"
     SUBSYSTEM_WARP_ENGINE = "SWE"
@@ -36,6 +63,14 @@ class AppState(Enum):
     KLINGON_SHIPS_COORDS = "KSC"
     ENTERPRISE_POSITION = "EPOS"
     ENTERPRISE_QUADRANT = "EQUAD"
+
+
+CAPITAN_STATUSES = [
+    AppState.REMAINING_KLINGONS,
+    AppState.REMAINING_DAYS,
+    AppState.SHIP_TOTAL_ENERGY,
+    AppState.SHIP_OK
+]
 
 
 class AppStateLabels(Enum):

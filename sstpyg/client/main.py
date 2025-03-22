@@ -5,7 +5,7 @@ import arcade
 import asyncio
 import threading
 
-from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels
+from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels, CAPITAN_STATUSES
 from sstpyg.client.utils import abs_coords_to_sector_coords, srs_to_positions
 from sstpyg.client.mocks import srs
 from sstpyg.comms.client import ClientHandler
@@ -41,6 +41,7 @@ class GameView(arcade.View):
         self.communication = ClientHandler(self.server_address, self.role)
         self.background_color = arcade.color.BLACK
         arcade.load_font(RESOURCES_PATH / "Okuda.otf")
+        self.run_fetch_status = True
 
         self.stardate = arcade.Text(
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
@@ -92,14 +93,16 @@ class GameView(arcade.View):
 
     def start_fetch_status_task(self):
         # Ejecuta la tarea asincrónica en un hilo separado
-        threading.Thread(target=self.fetch_status_task).start()
+        thread = threading.Thread(target=self.fetch_status_task)
+        self.thread = thread
+        thread.start()
 
     def fetch_status_task(self):
-        while True:
+        while self.run_fetch_status:
             self.status_info = self.communication.get_status()
             import time
 
-            time.sleep(3)
+            time.sleep(1)
 
     def generate_klingon_sprite(self, coords):
         img = RESOURCES_PATH / "klingon_logo.png"
@@ -217,7 +220,8 @@ class GameView(arcade.View):
         """Draw status."""
         status_text = ""
         for key, value in self.status_info.items():
-            status_text += f"{key}: {value}\n"
+            if AppState(key) in Division.get_statuses(self.role):
+                status_text += f"{getattr(AppStateLabels, AppState(key).name).value}: {value}\n"
         self.status.text = "STATUS \n" + status_text
         self.status.draw()
 
@@ -291,6 +295,8 @@ class GameView(arcade.View):
         https://api.arcade.academy/en/latest/arcade.key.html
         """
         if key == arcade.key.ESCAPE:
+            self.run_fetch_status = False
+            self.thread.join()
             arcade.close_window()
         if key == arcade.key.RETURN:
             self.process_command()
