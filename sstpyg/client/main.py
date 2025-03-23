@@ -67,7 +67,14 @@ class GameView(arcade.View):
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
         )
         self.error_message = arcade.Text(
-            "", 350, 310, LCARSColors.RED.value, 144, font_name="Okuda", align="center", width=500
+            "",
+            350,
+            310,
+            LCARSColors.RED.value,
+            144,
+            font_name="Okuda",
+            align="center",
+            width=500,
         )
         self.stardate.text = "STARDATE 41353.0"
         self.prompt = arcade.Text(
@@ -142,7 +149,7 @@ class GameView(arcade.View):
             shields = self.status_info[AppState.SUBSYSTEM_SHIELD.value]
             rem_days = self.status_info[AppState.REMAINING_DAYS.value]
             if not (rem_energy and shields and rem_days):
-                #breakpoint()
+                # breakpoint()
                 self.game_lost = True
                 self.run_fetch_status = False
 
@@ -211,6 +218,50 @@ class GameView(arcade.View):
             y = GRID_BOTTOM + v_grid_number * int(GRID_SIZE)
             arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, light_blue_translucent, 2)
             v_grid_number += 1
+
+        arcade.draw_line(
+            GRID_LEFT - 10,
+            GRID_TOP,
+            GRID_LEFT - 10,
+            GRID_BOTTOM,
+            LCARSColors.ORANGE.value,
+            2,
+        )
+
+        arcade.draw_line(
+            GRID_RIGHT + 10,
+            GRID_TOP,
+            GRID_RIGHT + 10,
+            GRID_BOTTOM,
+            LCARSColors.ORANGE.value,
+            2,
+        )
+
+        for i in range(8):
+            arcade.draw_text(
+                str(i + 1),
+                GRID_LEFT - 25,
+                485 - (i * GRID_SIZE),
+                LCARSColors.BLUE.value,
+                14,
+                font_name="Okuda",
+            )
+            arcade.draw_text(
+                str(i + 1),
+                GRID_RIGHT + 25,
+                485 - (i * GRID_SIZE),
+                LCARSColors.BLUE.value,
+                14,
+                font_name="Okuda",
+            )
+            arcade.draw_text(
+                str(i + 1),
+                GRID_LEFT + 34 + (i * GRID_SIZE * 1.40),
+                530,
+                LCARSColors.BLUE.value,
+                14,
+                font_name="Okuda",
+            )
 
         # Mostrar naves
         self.space_objects.clear()
