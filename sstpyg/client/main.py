@@ -44,7 +44,6 @@ class GameView(arcade.View):
     def setup(self):
         """Set up the game and initialize the variables."""
         self.communication = ClientHandler(self.server_address, self.role)
-        self.background_color = arcade.color.BLACK
         arcade.load_font(RESOURCES_PATH / "Okuda.otf")
 
         self.run_fetch_status = True
@@ -145,12 +144,12 @@ class GameView(arcade.View):
 
         self.space_objects.append(sprite)
 
-    def place_sprites(self, img_file_name, set_of_coords, scale=0.040):
+    def place_sprites(self, img_file_name, set_of_coords, scale=0.030):
         for coords in set_of_coords:
             self.generate_space_object_sprite(
                 img_file_name,
                 (
-                    GRID_LEFT + coords[0] * GRID_SIZE - (GRID_SIZE / 2),
+                    GRID_LEFT + coords[0] * int(GRID_SIZE * 1.4) - (GRID_SIZE / 2),
                     GRID_TOP - coords[1] * GRID_SIZE + (GRID_SIZE / 2),
                 ),
                 scale,
@@ -159,6 +158,16 @@ class GameView(arcade.View):
     def draw_map_grid(self):
         """Draw the map grid."""
         # Dibujar líneas verticales
+        background = arcade.SpriteList()
+
+        img = RESOURCES_PATH / "starfield.jpg"
+        bg_sprite = arcade.Sprite(
+            img,
+            scale=0.25,
+        )
+        bg_sprite.position = ((WINDOW_WIDTH // 2) - 60, (WINDOW_HEIGHT // 2) - 40)
+        background.append(bg_sprite)
+        background.draw()
 
         k_positions, e_positions, s_positions, b_positions = srs_to_positions(
             self.positions
@@ -172,13 +181,19 @@ class GameView(arcade.View):
         self.galactic_registry[current_quadrant[1] - 1][current_quadrant[0] - 1] = (
             summary
         )
+        light_blue_translucent = (173, 216, 230, 40)
 
-        for x in range(GRID_LEFT, GRID_RIGHT + 1, GRID_SIZE):
-            arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, LCARSColors.BEIGE.value, 2)
+        h_grid_number = 1
+        while h_grid_number < 8:
+            x = GRID_LEFT + h_grid_number * int(GRID_SIZE * 1.4)
+            arcade.draw_line(x, GRID_BOTTOM, x, GRID_TOP, light_blue_translucent, 2)
+            h_grid_number += 1
 
-        # Dibujar líneas horizontales
-        for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
-            arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
+        v_grid_number = 1
+        while v_grid_number < 8:
+            y = GRID_BOTTOM + v_grid_number * int(GRID_SIZE)
+            arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, light_blue_translucent, 2)
+            v_grid_number += 1
 
         # Mostrar naves
         self.space_objects.clear()
@@ -348,7 +363,10 @@ class GameView(arcade.View):
                 self.communication.command(
                     {
                         "command": command,
-                        "parameters": {"direction": direction, "warp_factor": warp_factor},
+                        "parameters": {
+                            "direction": direction,
+                            "warp_factor": warp_factor,
+                        },
                     }
                 )
             elif command in ["dis", "rep"]:
