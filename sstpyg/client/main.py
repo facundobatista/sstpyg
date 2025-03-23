@@ -68,7 +68,7 @@ class GameView(arcade.View):
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
         )
         self.error_message = arcade.Text(
-            "", 450, 310, LCARSColors.RED.value, 144, font_name="Okuda"
+            "", 350, 310, LCARSColors.RED.value, 144, font_name="Okuda", align="center", width=500
         )
         self.stardate.text = "STARDATE 41353.0"
         self.prompt = arcade.Text(
@@ -104,6 +104,8 @@ class GameView(arcade.View):
         self.show_error = False
         self.status_info = {}
         self.positions = []
+        self.game_lost = False
+        self.game_won = False
 
         # Background Sprite
         self.background = arcade.SpriteList()
@@ -135,8 +137,23 @@ class GameView(arcade.View):
     def fetch_status_task(self):
         while self.run_fetch_status:
             self.status_info = self.communication.get_status()
+            # Check a few things in the new info
+            # Game over: energy 0, they destroy us, time over
+            rem_energy = self.status_info[AppState.SHIP_TOTAL_ENERGY.value]
+            shields = self.status_info[AppState.SUBSYSTEM_SHIELD.value]
+            rem_days = self.status_info[AppState.REMAINING_DAYS.value]
+            if not (rem_energy and shields and rem_days):
+                #breakpoint()
+                self.game_lost = True
+                self.run_fetch_status = False
 
-            time.sleep(1)
+            # Game won
+            rem_klingons = self.status_info[AppState.REMAINING_KLINGONS.value]
+            if not rem_klingons:
+                self.game_won = True
+                self.run_fetch_status = False
+
+            time.sleep(5)
 
     def generate_space_object_sprite(self, img_file_name, coords, scale):
         img = RESOURCES_PATH / f"{img_file_name}.png"
@@ -257,9 +274,10 @@ class GameView(arcade.View):
                     font_name="Okuda",
                 )
 
-    def draw_error_message(self):
+    def draw_error_message(self, msg="ERROR"):
         """Draw error message."""
-        self.error_message.text = "ERROR"
+        self.reset_screen()
+        self.error_message.text = msg
         self.error_message.draw()
 
     def draw_status(self):
@@ -283,16 +301,19 @@ class GameView(arcade.View):
         # Do changes needed to restart the game here if you want to support that
         pass
 
-    def on_draw(self):
-        """
-        Render the screen.
-        """
+    def reset_screen(self):
         self.clear()
         self.background.draw()
         self.stardate.draw()
         self.prompt.draw()
         self.draw_status()
         self.draw_command_log()
+
+    def on_draw(self):
+        """
+        Render the screen.
+        """
+        self.reset_screen()
         if self.show_grid:
             self.draw_map_grid()
             self.space_objects.draw()
@@ -302,6 +323,10 @@ class GameView(arcade.View):
             self.draw_grs()
         if self.show_error:
             self.draw_error_message()
+        if self.game_lost:
+            self.draw_error_message("GAME OVER")
+        if self.game_won:
+            self.draw_error_message("YOU WIN")
 
     def draw_prompt(self):
         """Draw prompt."""

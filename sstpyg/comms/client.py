@@ -9,7 +9,8 @@ class ClientHandler:
         Server address is a combination of the host and port.
         """
         self.server_address = server_address
-        self.sync_client = httpx.Client()
+        transport = httpx.HTTPTransport(retries=3)
+        self.sync_client = httpx.Client(transport=transport)
         self._initialize(role)
 
     def _initialize(self, role):

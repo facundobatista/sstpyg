@@ -6,7 +6,7 @@ from sstpyg.client.constants import AppState
 
 def get_server_info():
     return {
-        AppState.REMAINING_KLINGONS.value: 10,
+        AppState.REMAINING_KLINGONS.value: 0,
         AppState.REMAINING_DAYS.value: 10,
         AppState.SHIP_TOTAL_ENERGY.value: 10,
         AppState.SHIP_ENG_ENERGY.value: 10,
