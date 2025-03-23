@@ -4,11 +4,11 @@ from dataclasses import dataclass, asdict
 
 from sstpyg.server.safemap import SafeMap
 
-KLINGON = "(K)"
-ENTERPRISE = ":E:"
-EMPTY = "---"
-STAR = " * "
-BASE = "[@]"
+KLINGON = "K"
+ENTERPRISE = "E"
+EMPTY = ""
+STAR = "S"
+BASE = "B"
 OUTGALAXY = "***"
 
 
@@ -17,7 +17,7 @@ class State:
     loc_quadrant: tuple[int, int]
     loc_sector: tuple[int, int]
     remaining_energy: int = random.randint(2500, 3000)
-    remaining_days: int = random.randint(900, 1500)
+    remaining_days: float = random.randint(15, 25)
     remaining_klingons: int = random.randint(10, 20)
     remaining_torpedoes: int = random.randint(8, 12)
     subs_torpedoes: int = 1
@@ -35,7 +35,7 @@ class Engine:
     def __init__(self):
 
         # the galaxy map is 8x8, where each item there is another map 8x8
-        self.mapa = SafeMap(8, 8, out_of_map=OUTGALAXY)
+        self.mapa = SafeMap(8, 8, out_of_map=None)
         for x in range(8):
             for y in range(8):
                 self.mapa[(x, y)] = SafeMap(8, 8, fill=EMPTY)
@@ -66,6 +66,7 @@ class Engine:
 
     async def add_client(self, role):
         print("====== add client", repr(role))
+        # FIXME implement!
 
     def repeat(self, delay, func, first=True):
         loop = asyncio.get_event_loop()
@@ -74,23 +75,34 @@ class Engine:
         loop.call_later(delay, self.repeat, delay, func, False)
 
     def klingon_ai(self):
+        """Called every 5 seconds."""
         print("========== klingon attack!!")
+        # FIXME implement!
 
     def time_goes_by(self):
+        """Called once per second."""
+        # FIXME: support the Enterprise being "docked"
         self.state.remaining_energy -= 1
+
+        # a "mission day" ~= 1 real minute; so once per second we reduce it in 1/60
+        self.state.remaining_days -= 1 / 60
 
     async def get_state(self):
         return asdict(self.state)
 
-    async def command(self, command):
-        match command:
-            case "srs":
-                result = await self.cmd_srs()
-            case "lrs":
-                result = await self.cmd_lrs()
-            case _:
-                result = f"ERROR: bad command {command!r}"
-        return result
+    async def command(self, command_info):
+        command = command_info["command"]
+        meth_name = f"cmd_{command}"
+        meth = getattr(self, meth_name, None)
+        if meth is None:
+            return f"ERROR: missing command: {command!r}"
+
+        # FIXME: nav, dam, rep, dis, pha, she, tor
+        parameters = command_info.get("parameters", {})
+        try:
+            return await meth(**parameters)
+        except TypeError:
+            return f"ERROR: bad parameters: {parameters}"
 
     async def get_galaxy(self, coords):
         if coords is not None:
@@ -98,8 +110,13 @@ class Engine:
         else:
             return self.mapa
 
-    async def cmd_srs(self):
+    async def cmd_nav(self, direction, warp_factor):
+        print("======== nav!!", direction, warp_factor)
         return self.mapa[self.state.loc_quadrant]
+
+    async def cmd_srs(self):
+        quadrant = self.mapa[self.state.loc_quadrant]
+        return quadrant.serialize()
 
     def _quadrant_summary(self, quadrant):
         cant_klingon = 0
@@ -122,8 +139,14 @@ class Engine:
             for dx in (-1, 0, +1):
                 coords = (qx + dx, qy + dy)
                 quadrant = self.mapa[coords]
-                summary = self._quadrant_summary(quadrant)
-                print("====== LRS?", coords, summary)
+                if quadrant is None:
+                    # out of galaxy
+                    summary = "***"
+                else:
+                    values = self._quadrant_summary(quadrant)
+                    # top values to 9
+                    values = [value if value <= 9 else 9 for value in values]
+                    summary = "".join(map(str, values))
                 row.append(summary)
             result.append(row)
         return result

@@ -35,6 +35,9 @@ class SafeMap:
         else:
             raise ValueError("out of map")
 
+    def serialize(self):
+        return self.xmap
+
     def switch(self, coord, delta):
         """Switch the element from the coordinate with the coordinate + delta."""
         x1, y1 = coord

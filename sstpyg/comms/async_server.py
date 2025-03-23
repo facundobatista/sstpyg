@@ -6,6 +6,7 @@ from aiohttp import web
 from sstpyg.server.main import Engine
 
 engine = Engine()
+engine.init()
 
 
 def jsonify(obj):
@@ -14,28 +15,20 @@ def jsonify(obj):
 
 
 async def initialize(request):
-    print("===== serving init")
     role = request.match_info.get("role")
     await engine.add_client(role)
     return web.Response(text="")
 
 
 async def status(request):
-    print("===== serving status?")
     state = await engine.get_state()
-    print("===== serving status!", state)
     return jsonify(state)
 
 
 async def command(request):
-    print("===== serving command")
     data = await request.json()
     result = await engine.command(data)
     return jsonify(result)
-
-#            content_length = int(self.headers.get("Content-Length", 0))
-#            command_body = json.loads(self.rfile.read(content_length))
-#            return  self.game_engine.command(command_body)
 
 
 app = web.Application()
@@ -52,4 +45,8 @@ def run_server():
         ip = s.getsockname()[0]
         print("======== Local IP:", ip)
 
+    async def init_engine(app):
+        await engine.init()
+
+    app.on_startup.append(init_engine)
     web.run_app(app)
