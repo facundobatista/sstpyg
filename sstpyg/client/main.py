@@ -220,11 +220,30 @@ class GameView(arcade.View):
 
     def draw_grs(self):
         """Draw the GRS."""
-        for i in range(8):
+        for i in range(8):        
             for j in range(8):
+                if i == 0:
+                    arcade.draw_text(
+                        str(j + 1),
+                        340 + j * 70 + 20,
+                        462 - (i-1) * 50,
+                        LCARSColors.BLUE.value,
+                        20,
+                        font_name="Okuda",
+                    )
+                if j == 0:
+                    arcade.draw_text(
+                        str(i + 1),
+                        340 + j * 70 - 30,
+                        462 - i * 50 + 10,
+                        LCARSColors.BLUE.value,
+                        20,
+                        font_name="Okuda",
+                    )
+
                 arcade.draw_text(
                     self.galactic_registry[i][j],
-                    340 + j * 50,
+                    340 + j * 70,
                     462 - i * 50,
                     LCARSColors.BEIGE.value,
                     40,
