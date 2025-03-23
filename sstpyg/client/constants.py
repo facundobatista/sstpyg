@@ -49,19 +49,20 @@ class Division(Enum):
 
 
 class AppState(Enum):
-    REMAINING_KLINGONS = "RMK"
-    REMAINING_DAYS = "RMD"
-    SHIP_TOTAL_ENERGY = "STE"
+    REMAINING_TORPEDOES = "remaining_torpedoes"
+    REMAINING_KLINGONS = "remaining_klingons"
+    REMAINING_DAYS = "remaining_days"
+    SHIP_TOTAL_ENERGY = "remaining_energy"
     SHIP_OK = "SOO"
     SHIP_ENG_ENERGY = "SEE"
-    SUBSYSTEM_TORPEDO = "SST"
-    SUBSYSTEM_PHASERS = "SSP"
-    SUBSYSTEM_WARP_ENGINE = "SWE"
-    SUBSYSTEM_SHIELD = "SSS"
-    SUBSYSTEM_IMPULSE = "SSI"
+    SUBSYSTEM_TORPEDO = "subs_torpedoes"
+    SUBSYSTEM_PHASERS = "subs_phasers"
+    SUBSYSTEM_WARP_ENGINE = "subs_warp"
+    SUBSYSTEM_SHIELD = "subs_shields"
+    SUBSYSTEM_IMPULSE = "subs_impulse"
     KLINGON_SHIPS_COORDS = "KSC"
-    ENTERPRISE_POSITION = "EPOS"
-    ENTERPRISE_QUADRANT = "EQUAD"
+    ENTERPRISE_POSITION = "loc_sector"
+    ENTERPRISE_QUADRANT = "loc_quadrant"
 
 
 CAPITAN_STATUSES = [
@@ -75,6 +76,7 @@ CAPITAN_STATUSES = [
 class AppStateLabels(Enum):
     REMAINING_KLINGONS = "Remaining Klingons"
     REMAINING_DAYS = "Remaining Days"
+    REMAINING_TORPEDOES = "Remaining Torpedoes"
     SHIP_TOTAL_ENERGY = "Ship Total Energy"
     SHIP_ENG_ENERGY = "Ship Engine Energy"
     SHIP_OK = "Ship Status"
