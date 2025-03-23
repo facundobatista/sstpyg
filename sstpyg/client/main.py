@@ -368,7 +368,7 @@ class GameView(arcade.View):
     def draw_location(self):
         ent_quadrant = self.status_info[AppState.ENTERPRISE_QUADRANT.value]
         ent_sector = self.status_info[AppState.ENTERPRISE_POSITION.value]
-        self.location.text = f"Quadrant: {ent_quadrant[0]+1}, {ent_quadrant[1]+1}        Sector:{ent_sector[0]+1}, {ent_sector[1]+1}"
+        self.location.text = f"Quadrant: {ent_quadrant[0]+1}, {ent_quadrant[1]+1}        Sector: {ent_sector[0]+1}, {ent_sector[1]+1}"
         self.location.draw()
 
     def draw_command_log(self):
