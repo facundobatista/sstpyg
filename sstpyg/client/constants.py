@@ -38,7 +38,6 @@ class Division(Enum):
                 AppState.SUBSYSTEM_WARP_ENGINE,
                 AppState.SUBSYSTEM_SHIELD,
                 AppState.SUBSYSTEM_IMPULSE,
-                AppState.SHIP_OK,
             ],
             cls.TACTICAL.value.lower(): [
                 AppState.SUBSYSTEM_TORPEDO,
@@ -46,11 +45,7 @@ class Division(Enum):
                 AppState.SUBSYSTEM_SHIELD,
             ],
         }
-        return (
-            mapping[role]
-            + [AppState.ENTERPRISE_POSITION]
-            + [AppState.ENTERPRISE_QUADRANT]
-        )
+        return mapping[role]
 
 
 class AppState(Enum):
