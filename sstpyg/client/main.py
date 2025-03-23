@@ -139,6 +139,7 @@ class GameView(arcade.View):
         self.lrs_registry = lrs_registry
 
         self.start_fetch_status_task()
+        self.communication.get_status()
 
     def start_fetch_status_task(self):
         # Ejecuta la tarea asincrónica en un hilo separado
