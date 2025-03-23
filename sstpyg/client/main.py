@@ -149,12 +149,16 @@ class GameView(arcade.View):
 
     def fetch_status_task(self):
         while self.run_fetch_status:
-            self.status_info = self.communication.get_status()
+            status_info = self.communication.get_status()
             # Check a few things in the new info
             # Game over: energy 0, they destroy us, time over
-            rem_energy = self.status_info[AppState.SHIP_TOTAL_ENERGY.value]
-            shields = self.status_info[AppState.SUBSYSTEM_SHIELD.value]
-            rem_days = self.status_info[AppState.REMAINING_DAYS.value]
+            rem_energy = status_info[AppState.SHIP_TOTAL_ENERGY.value]
+            shields = status_info[AppState.SUBSYSTEM_SHIELD.value]
+            # Format value with 2 decimals
+            rem_days = "{:.2f}".format(status_info[AppState.REMAINING_DAYS.value])
+            status_info[AppState.REMAINING_DAYS.value] = rem_days
+
+            self.status_info = status_info
 
             if not (rem_energy and shields and rem_days):
                 self.game_lost = True
