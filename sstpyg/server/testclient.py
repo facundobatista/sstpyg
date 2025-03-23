@@ -15,9 +15,10 @@ from sstpyg.server.main import Engine  # noqa
 
 class AsyncCmd:
     def __init__(self):
-        self.prompt_session = PromptSession(">>> ")
+        self.prompt_session = PromptSession(self.prompt)
 
     async def run(self):
+        print(self.intro)
         with patch_stdout():
             await asyncio.create_task(self._handle_user_input())
 
@@ -33,8 +34,6 @@ class AsyncCmd:
                 cmd = "eof"
                 rest = ""
             else:
-                print("======== raw user inp", repr(user_input))
-
                 parts = user_input.split(maxsplit=1)
                 match parts:
                     case []:
@@ -73,13 +72,21 @@ class TestShell(AsyncCmd):
     # -- commands
 
     async def do_galaxy(self, arg):
-        await self.engine.command("galaxy")
+        if not arg:
+            print("Error, usage: galaxy x y")
+            return
 
-    async def do_fake_srs(self, arg):
-        await self.engine.cmd_srs()
+        coords = tuple(map(int, arg.split()))
+        quad = await self.engine.get_galaxy(coords)
+        quad.show()
 
     async def do_srs(self, arg):
-        await self.engine.command("srs")
+        quad = await self.engine.command("srs")
+        quad.show()
+
+    async def do_lrs(self, arg):
+        data = await self.engine.command("lrs")
+        pprint.pprint(data)
 
     async def do_state(self, arg):
         state = await self.engine.get_state()

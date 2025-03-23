@@ -1,7 +1,9 @@
 import asyncio
 import random
+from dataclasses import dataclass
 
 from sstpyg.comms import Communications
+from sstpyg.server.safemap import SafeMap
 
 
 def run():
@@ -9,80 +11,60 @@ def run():
     print("comms?", Communications)
 
 
+KLINGON = "(K)"
+ENTERPRISE = ":E:"
+EMPTY = "---"
+STAR = " * "
+BASE = "[@]"
+OUTGALAXY = "***"
+
+
+@dataclass
+class State:
+    loc_quadrant: tuple[int, int]
+    loc_sector: tuple[int, int]
+    remaining_energy: int = random.randint(2500, 3000)
+    remaining_days: int = random.randint(900, 1500)
+    remaining_klingons: int = random.randint(10, 20)
+    remaining_torpedoes: int = random.randint(8, 12)
+    subs_torpedoes: int = 1
+    subs_phasers: int = 1
+    subs_warp: int = 1
+    subs_impulse: int = 1
+    subs_shields: int = 1
+
+
 class Engine:
-    cant_klingon_total = random.randint(10, 20)
     cant_stars_total = random.randint(40, 60)
-    cant_starbases_total = random.randint(2, 5)
-    cant_torpedoes = random.randint(8, 12)
-    tiempo_total = random.randint(900, 1500)
+    cant_bases_total = random.randint(2, 5)
     enterprise_loc = ()
-    total_energy = random.randint(2500, 3000)
 
     def __init__(self):
-        self.mapa = []
-        self.estado = {
-            "remaining_energy": self.total_energy,
-            "remaining_days": self.tiempo_total,
-            "remaining_klingons": self.cant_klingon_total,
-            "remaining_torpedoes": self.cant_torpedoes,
-            "subs_torpedoes": 1,
-            "subs_phasers": 1,
-            "subs_warp": 1,
-            "subs_impulse": 1,
-            "subs_shields": 1,
-        }
-        enterprise = False
-        while len(self.mapa) < 8:
-            cx = []
-            while len(cx) < 8:
-                cy = []
-                while len(cy) < 8:
-                    ox = []
-                    while len(ox) < 8:
-                        objeto = "---"
-                        ox.append(objeto)
-                    cy.append(ox)
-                cx.append(cy)
-            self.mapa.append(cx)
 
-        for _ in range(random.randint(10, 20)):
-            r_cx = random.choice(self.mapa)
-            r_cy = random.choice(r_cx)
-            r_ox = random.choice(r_cy)
-            num_random = random.randint(0, 7)
-            if r_ox[num_random] == "---":
-                r_ox[num_random] = "klingon"
+        # the galaxy map is 8x8, where each item there is another map 8x8
+        self.mapa = SafeMap(8, 8, out_of_map=OUTGALAXY)
+        for x in range(8):
+            for y in range(8):
+                self.mapa[(x, y)] = SafeMap(8, 8, fill=EMPTY)
 
-        for _ in range(random.randint(50, 60)):
-            r_cx = random.choice(self.mapa)
-            r_cy = random.choice(r_cx)
-            r_ox = random.choice(r_cy)
-            num_random = random.randint(0, 7)
-            if r_ox[num_random] == "---":
-                r_ox[num_random] = "star"
+        self._fill_map(KLINGON, State.remaining_klingons)
+        self._fill_map(STAR, self.cant_stars_total)
+        self._fill_map(BASE, self.cant_bases_total)
 
-        for _ in range(random.randint(3, 5)):
-            r_cx = random.choice(self.mapa)
-            r_cy = random.choice(r_cx)
-            r_ox = random.choice(r_cy)
-            num_random = random.randint(0, 7)
-            if r_ox[num_random] == "---":
-                r_ox[num_random] = "starbase"
+        (enterprise_position,) = self._fill_map(ENTERPRISE, 1)
+        loc_quadrant, loc_sector = enterprise_position
 
-        while not enterprise:
-            print("while")
-            r_cx_num = random.randint(0, 7)
-            r_cx = self.mapa[r_cx_num]
-            r_cy_num = random.randint(0, 7)
-            r_cy = r_cx[r_cy_num]
-            r_ox_num = random.randint(0, 7)
-            r_ox = r_cy[r_ox_num]
-            num_random = random.randint(0, 7)
-            if r_ox[num_random] == "---":
-                r_ox[num_random] = "enterprise"
-                self.enterprise_loc = ((r_cx_num, r_cy_num), (r_ox_num, num_random))
-                print("enterprise True")
-                enterprise = True
+        self.state = State(loc_quadrant=loc_quadrant, loc_sector=loc_sector)
+
+    def _fill_map(self, item, quantity):
+        positions = []
+        while quantity:
+            qx, qy, sx, sy = [random.randrange(8) for _ in range(4)]
+            if self.mapa[(qx, qy)][(sx, sy)] == EMPTY:
+                self.mapa[(qx, qy)][(sx, sy)] = item
+                positions.append(((qx, qy), (sx, sy)))
+                quantity -= 1
+        return positions
 
     async def init(self):
         self.loop = asyncio.get_event_loop()
@@ -99,39 +81,50 @@ class Engine:
         print("========== klingon attack!!")
 
     def time_goes_by(self):
-        self.estado["remaining_energy"] = self.estado["remaining_energy"] - 1
-
-    async def command(self, command):
-        if command == "galaxy":
-            await self.cmd_galaxy()
-        if command == "srs":
-            await self.cmd_srs()
-
-    async def cmd_galaxy(self):
-        print(self.mapa)
-
-    async def cmd_srs(self):
-        cuadrante = self.enterprise_loc[0]
-        cuadrante_x = cuadrante[0]
-        cuadrante_y = cuadrante[1]
-        print(self.mapa[cuadrante_x][cuadrante_y])
-
-    async def cmd_lrs(self):
-        x, y= self.enterprise_loc[0]
-        for cx in (-1, 0, +1):
-            for cy in (-1, 0, +1):
-                cant_klingon = 0
-                cant_stars = 0
-                cant_starbases = 0
-                for cuadrante in self.mapa[x - cx][x - cy]:
-                    for objeto in cuadrante:
-                        if objeto == "klingon":
-                            cant_klingon += 1
-                        elif objeto == "star":
-                            cant_stars += 1
-                        elif objeto == "starbase":
-                            cant_starbases += 1
-                        print(cant_klingon, cant_stars, cant_starbases)
+        self.state.remaining_energy -= 1
 
     async def get_state(self):
-        return self.estado
+        return self.state
+
+    async def command(self, command):
+        match command:
+            case "srs":
+                result = await self.cmd_srs()
+            case "lrs":
+                result = await self.cmd_lrs()
+            case _:
+                result = f"ERROR: bad command {command!r}"
+        return result
+
+    async def get_galaxy(self, coords):
+        if coords is not None:
+            return self.mapa[coords]
+        else:
+            return self.mapa
+
+    async def cmd_srs(self):
+        return self.mapa[self.state.loc_quadrant]
+
+    def _quadrant_summary(self, quadrant):
+        cant_klingon = 0
+        cant_stars = 0
+        cant_bases = 0
+        for objeto in quadrant.walk():
+            if objeto == KLINGON:
+                cant_klingon += 1
+            elif objeto == STAR:
+                cant_stars += 1
+            elif objeto == BASE:
+                cant_bases += 1
+        return cant_klingon, cant_bases, cant_stars
+
+    async def cmd_lrs(self):
+        qx, qy = self.state.loc_quadrant
+        result = []
+        for dx in (-1, 0, +1):
+            row = []
+            for dy in (-1, 0, +1):
+                quadrant = self.mapa[(qx + dx, qy + dy)]
+                row.append(self._quadrant_summary(quadrant))
+            result.append(row)
+        return result
