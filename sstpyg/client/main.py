@@ -209,9 +209,7 @@ class GameView(arcade.View):
         summary = str(n_klingons) + str(n_starbases) + str(n_stars)
         current_quadrant = self.status_info[AppState.ENTERPRISE_QUADRANT.value]
 
-        self.galactic_registry[current_quadrant[1] - 1][current_quadrant[0] - 1] = (
-            summary
-        )
+        self.galactic_registry[current_quadrant[1]][current_quadrant[0]] = summary
         light_blue_translucent = (173, 216, 230, 40)
 
         h_grid_number = 1
@@ -298,8 +296,8 @@ class GameView(arcade.View):
         for i in range(3):
             for j in range(3):
                 try:
-                    x = current_quadrant[1] + (i - 1) - 1
-                    y = current_quadrant[0] + (j - 1) - 1
+                    x = current_quadrant[1] + (i - 1)
+                    y = current_quadrant[0] + (j - 1)
                     if x < 0 or y < 0:
                         raise Exception
                     self.galactic_registry[x][y] = self.lrs_registry[i][j]
