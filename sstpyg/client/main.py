@@ -64,7 +64,7 @@ class GameView(arcade.View):
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
         )
         self.error_message = arcade.Text(
-            "", 590, 310, LCARSColors.RED.value, 144, font_name="Okuda"
+            "", 450, 310, LCARSColors.RED.value, 144, font_name="Okuda"
         )
 
         self.stardate.text = "STARDATE 41353.2"
@@ -86,7 +86,7 @@ class GameView(arcade.View):
         self.show_grid = False
         self.show_lrs = False
         self.show_grs = False
-        self.show_status = False
+        self.show_status = True
         self.show_error = False
 
         # Create the sprite lists
@@ -223,11 +223,12 @@ class GameView(arcade.View):
                     pass
                 arcade.draw_text(
                     self.lrs_registry[i][j],
-                    340 + j * 90,
-                    462 - i * 90,
+                    440 + j * 100,
+                    410 - i * 100,
                     LCARSColors.BEIGE.value,
                     72,
                     font_name="Okuda",
+                    align="center",
                 )
 
     def draw_grs(self):
@@ -322,7 +323,6 @@ class GameView(arcade.View):
         self.show_error = False
         self.show_grid = False
         self.show_lrs = False
-        self.show_status = False
         self.show_grs = False
 
         command = self.text_input[:3].lower()
@@ -330,16 +330,13 @@ class GameView(arcade.View):
         if command == "srs":
             self.positions = self.communication.command({"command": "srs"})
             self.show_grid = True
-            self.show_status = True
             arcade.play_sound(self.process_sound, volume=0.5)
         elif command == "lrs":
             self.lrs_registry = self.communication.command({"command": "lrs"})
             self.show_lrs = True
-            self.show_status = True
             arcade.play_sound(self.process_sound, volume=0.5)
         elif command == "grs":
             self.show_grs = True
-            self.show_status = True
             arcade.play_sound(self.process_sound, volume=0.5)
         elif command in ["she", "pha"]:
             _, energy = input.split(" ")
