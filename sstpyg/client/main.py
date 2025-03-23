@@ -49,7 +49,13 @@ class GameView(arcade.View):
         self.run_fetch_status = True
         tng_bridge_sound = RESOURCES_PATH / "tng_bridge_1.mp3"
         self.sound_tng_bridge = arcade.load_sound(tng_bridge_sound)
-        arcade.play_sound(self.sound_tng_bridge)
+        self.sound_tng_bridge.play(volume=0.3, loop=True)
+
+        tng_key_sound = RESOURCES_PATH / "keyok2.mp3"
+        self.beep_1 = arcade.load_sound(tng_key_sound)
+
+        tng_process_sound = RESOURCES_PATH / "processing3.mp3"
+        self.process_sound = arcade.load_sound(tng_process_sound)
 
         self.stardate = arcade.Text(
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
@@ -335,9 +341,10 @@ class GameView(arcade.View):
                     "parameters": {"direction": direction, "warp_factor": warp_factor},
                 }
             )
-        elif self.text_input in [":q", ":wq"]:
+        elif self.text_input in [":q", ":wq", ":wq!", ":q!"]:
             self.run_fetch_status = False
             self.thread.join()
+            time.sleep(0.5)
             arcade.close_window()
         else:
             self.show_error = True
@@ -356,12 +363,15 @@ class GameView(arcade.View):
             self.thread.join()
             arcade.close_window()
         if key == arcade.key.RETURN:
+            arcade.play_sound(self.process_sound, volume=0.5)
             self.process_command()
         elif key == arcade.key.BACKSPACE:
+            arcade.play_sound(self.beep_1, volume=0.5)
             self.text_input = self.text_input[:-1]
-        elif key == arcade.key.LSHIFT:
+        elif key == arcade.key.LSHIFT or key == arcade.key.RSHIFT:
             pass
         else:
+            arcade.play_sound(self.beep_1, volume=0.5)
             self.text_input += chr(key)
         self.draw_prompt()
 
