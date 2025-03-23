@@ -1,42 +1,8 @@
 import asyncio
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
-from sstpyg.comms import Communications
 from sstpyg.server.safemap import SafeMap
-
-
-class GameEngine:
-    def initialize(self, role):
-        message = f"Initialize {role} received!"
-        print(message)
-
-        return message
-
-    def command(self, command_body):
-        message = f"Command received! {command_body}"
-        print(message)
-
-        # tmp: fix this
-        from sstpyg.client.mocks import srs, lrs
-
-        if command_body["command"] == "srs":
-            message = srs()
-        elif command_body["command"] == "lrs":
-            message = lrs()
-        return message
-
-    def get_status(self):
-        message = "Get status received!"
-        print(message)
-
-        # tmp: fix this
-        from sstpyg.client.mocks import get_server_info
-
-        message = get_server_info()
-
-        return message
-
 
 KLINGON = "(K)"
 ENTERPRISE = ":E:"
@@ -98,6 +64,9 @@ class Engine:
         self.repeat(5, self.klingon_ai)
         self.repeat(1, self.time_goes_by)
 
+    async def add_client(self, role):
+        print("====== add client", repr(role))
+
     def repeat(self, delay, func, first=True):
         loop = asyncio.get_event_loop()
         if not first:
@@ -111,7 +80,7 @@ class Engine:
         self.state.remaining_energy -= 1
 
     async def get_state(self):
-        return self.state
+        return asdict(self.state)
 
     async def command(self, command):
         match command:

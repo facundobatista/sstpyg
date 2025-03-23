@@ -1,3 +1,3 @@
-from sstpyg.comms.server import run_server
+from sstpyg.comms.async_server import run_server
 
 run_server()
