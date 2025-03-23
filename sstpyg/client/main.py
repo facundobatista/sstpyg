@@ -1,9 +1,7 @@
 import time
-from math import ceil
 from pathlib import Path
 
 import arcade
-import asyncio
 import threading
 
 from sstpyg.client.constants import (
@@ -11,22 +9,18 @@ from sstpyg.client.constants import (
     Division,
     AppState,
     AppStateLabels,
-    CAPITAN_STATUSES,
+    WINDOW_WIDTH,
+    WINDOW_HEIGHT,
+    WINDOW_TITLE,
+    GRID_RIGHT,
+    GRID_BOTTOM,
+    GRID_LEFT,
+    GRID_SIZE,
+    GRID_TOP,
 )
-from sstpyg.client.utils import abs_coords_to_sector_coords, srs_to_positions
-from sstpyg.client.mocks import srs
+from sstpyg.client.utils import srs_to_positions
 from sstpyg.comms.client import ClientHandler
 
-
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
-WINDOW_TITLE = "SSTPYG"
-
-GRID_SIZE = 40
-GRID_LEFT = 260
-GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
-GRID_BOTTOM = 220
-GRID_TOP = GRID_BOTTOM + GRID_SIZE * 8
 
 # Obtener el base path del archivo actual
 BASE_PATH = Path(__file__).parent
@@ -46,7 +40,10 @@ class GameView(arcade.View):
         self.communication = ClientHandler(self.server_address, self.role)
         self.background_color = arcade.color.BLACK
         arcade.load_font(RESOURCES_PATH / "Okuda.otf")
+
         self.run_fetch_status = True
+
+        # Sounds
         tng_bridge_sound = RESOURCES_PATH / "tng_bridge_1.mp3"
         self.sound_tng_bridge = arcade.load_sound(tng_bridge_sound)
         self.sound_tng_bridge.play(volume=0.3, loop=True)
@@ -60,18 +57,17 @@ class GameView(arcade.View):
         tng_error_sound = RESOURCES_PATH / "computer_error.mp3"
         self.error_sound = arcade.load_sound(tng_error_sound)
 
+        # Common texts
         self.stardate = arcade.Text(
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
         )
         self.error_message = arcade.Text(
             "", 590, 310, LCARSColors.RED.value, 144, font_name="Okuda"
         )
-
         self.stardate.text = "STARDATE 41353.2"
         self.prompt = arcade.Text(
             "", 260, 35, arcade.color.WHITE, 44, font_name="Okuda"
         )
-
         self.status = arcade.Text(
             "",
             950,
@@ -82,14 +78,17 @@ class GameView(arcade.View):
             width=300,
             multiline=True,
         )
+
         self.text_input = ""
         self.show_grid = False
         self.show_lrs = False
         self.show_grs = False
         self.show_status = False
         self.show_error = False
+        self.status_info = {}
+        self.positions = []
 
-        # Create the sprite lists
+        # Background Sprite
         self.background = arcade.SpriteList()
 
         img = RESOURCES_PATH / "lcars.jpg"
@@ -97,19 +96,15 @@ class GameView(arcade.View):
         self.bg_sprite.position = WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2
         self.background.append(self.bg_sprite)
 
-        # Klingon ships
+        # Ship Sprites
         self.space_objects = arcade.SpriteList()
 
-        self.status_info = {}
-        self.positions = []
-
         galactic_registry = [["---" for x in range(0, 8)] for x in range(0, 8)]
-
         self.galactic_registry = galactic_registry
 
         lrs_registry = [["---" for x in range(0, 3)] for x in range(0, 3)]
-
         self.lrs_registry = lrs_registry
+
         self.start_fetch_status_task()
 
     def start_fetch_status_task(self):
@@ -124,42 +119,22 @@ class GameView(arcade.View):
 
             time.sleep(1)
 
-    def generate_klingon_sprite(self, coords):
-        img = RESOURCES_PATH / "klingon_logo.png"
-        klingon_sprite = arcade.Sprite(img, scale=0.040)
-        klingon_sprite.position = coords
+    def generate_space_object_sprite(self, img_file_name, coords, scale):
+        img = RESOURCES_PATH / f"{img_file_name}.png"
+        sprite = arcade.Sprite(img, scale=scale)
+        sprite.position = coords
 
-        self.space_objects.append(klingon_sprite)
+        self.space_objects.append(sprite)
 
-    def generate_enterprise_sprite(self, coords):
-        img = RESOURCES_PATH / "enterprise.png"
-        enterprise_sprite = arcade.Sprite(img, scale=0.040)
-        enterprise_sprite.position = coords
-
-        self.space_objects.append(enterprise_sprite)
-
-    def generate_starbase_sprite(self, coords):
-        img = RESOURCES_PATH / "starfleet_logo.png"
-        starbase_sprite = arcade.Sprite(img, scale=0.040)
-        starbase_sprite.position = coords
-
-        self.space_objects.append(starbase_sprite)
-
-    def generate_star_sprite(self, coords):
-        img = RESOURCES_PATH / "star.png"
-        star_sprite = arcade.Sprite(img, scale=0.040)
-        star_sprite.position = coords
-
-        self.space_objects.append(star_sprite)
-
-    def place_sprites(self, sprite_method, set_of_coords):
+    def place_sprites(self, img_file_name, set_of_coords, scale=0.040):
         for coords in set_of_coords:
-            sector_coords = abs_coords_to_sector_coords(coords)
-            sprite_method(
+            self.generate_space_object_sprite(
+                img_file_name,
                 (
-                    GRID_LEFT + sector_coords[0] * GRID_SIZE - (GRID_SIZE / 2),
-                    GRID_TOP - sector_coords[1] * GRID_SIZE + (GRID_SIZE / 2),
-                )
+                    GRID_LEFT + coords[0] * GRID_SIZE - (GRID_SIZE / 2),
+                    GRID_TOP - coords[1] * GRID_SIZE + (GRID_SIZE / 2),
+                ),
+                scale,
             )
 
     def draw_map_grid(self):
@@ -186,23 +161,23 @@ class GameView(arcade.View):
         for y in range(GRID_BOTTOM, GRID_TOP + 1, GRID_SIZE):
             arcade.draw_line(GRID_LEFT, y, GRID_RIGHT, y, LCARSColors.BEIGE.value, 2)
 
-        # Mostrar naves klingon
+        # Mostrar naves
         self.space_objects.clear()
 
         self.place_sprites(
-            self.generate_klingon_sprite,
+            "klingon_logo",
             k_positions,
         )
         self.place_sprites(
-            self.generate_enterprise_sprite,
+            "enterprise",
             e_positions,
         )
         self.place_sprites(
-            self.generate_starbase_sprite,
+            "starfleet_logo",
             b_positions,
         )
         self.place_sprites(
-            self.generate_star_sprite,
+            "star",
             s_positions,
         )
 
@@ -302,15 +277,6 @@ class GameView(arcade.View):
             self.draw_status()
         if self.show_error:
             self.draw_error_message()
-        # Call draw() on all your sprite lists below
-
-    def on_update(self, delta_time):
-        """
-        All the logic to move, and the game logic goes here.
-        Normally, you'll call update() on the sprite lists that
-        need it.
-        """
-        ...
 
     def draw_prompt(self):
         """Draw prompt."""
@@ -328,20 +294,24 @@ class GameView(arcade.View):
         command = self.text_input[:3].lower()
         input = self.text_input
         if command == "srs":
-            self.positions = self.communication.command({"command": "srs"})
+            arcade.play_sound(self.process_sound, volume=0.5)
+            self.positions = self.communication.command({"command": command})
             self.show_grid = True
             self.show_status = True
-            arcade.play_sound(self.process_sound, volume=0.5)
         elif command == "lrs":
-            self.lrs_registry = self.communication.command({"command": "lrs"})
+            arcade.play_sound(self.process_sound, volume=0.5)
+            self.lrs_registry = self.communication.command({"command": command})
             self.show_lrs = True
             self.show_status = True
+        elif command == "tor":
             arcade.play_sound(self.process_sound, volume=0.5)
+            self.communication.command({"command": command})
         elif command == "grs":
+            arcade.play_sound(self.process_sound, volume=0.5)
             self.show_grs = True
             self.show_status = True
-            arcade.play_sound(self.process_sound, volume=0.5)
         elif command in ["she", "pha"]:
+            arcade.play_sound(self.process_sound, volume=0.5)
             _, energy = input.split(" ")
             self.communication.command(
                 {
@@ -354,8 +324,18 @@ class GameView(arcade.View):
             _, direction, warp_factor = input.split(" ")
             self.communication.command(
                 {
-                    "command": "nav",
+                    "command": command,
                     "parameters": {"direction": direction, "warp_factor": warp_factor},
+                }
+            )
+        elif command in ["dis", "rep"]:
+            """ Permite asignar energía para el funcionamiento o reparación de cada subsistema """
+            arcade.play_sound(self.process_sound, volume=0.5)
+            _, subsystem, energy = input.split(" ")
+            self.communication.command(
+                {
+                    "command": command,
+                    "parameters": {"subsystem": subsystem, "energy": energy},
                 }
             )
         elif command in [":q", ":wq", ":wq!", ":q!"]:
@@ -393,12 +373,6 @@ class GameView(arcade.View):
             self.text_input += chr(key)
         self.draw_prompt()
 
-    def on_key_release(self, key, key_modifiers):
-        """
-        Called whenever the user lets off a previously pressed key.
-        """
-        pass
-
 
 def run(server_address, role):
     """Main function"""
@@ -411,5 +385,6 @@ def run(server_address, role):
     # Show GameView on screen
     window.show_view(game)
     game.setup()
+
     # Start the arcade game loop
     arcade.run()

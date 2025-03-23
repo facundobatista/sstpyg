@@ -1,10 +1,3 @@
-def abs_coords_to_sector_coords(abs_coords):
-    return (
-        ((abs_coords[0] - 1) % 8) + 1,
-        ((abs_coords[1] - 1) % 8) + 1,
-    )
-
-
 def srs_to_positions(positions):
     k_positions = []
     e_positions = []
