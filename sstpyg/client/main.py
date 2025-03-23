@@ -209,9 +209,7 @@ class GameView(arcade.View):
         summary = str(n_klingons) + str(n_starbases) + str(n_stars)
         current_quadrant = self.status_info[AppState.ENTERPRISE_QUADRANT.value]
 
-        self.galactic_registry[current_quadrant[1] - 1][current_quadrant[0] - 1] = (
-            summary
-        )
+        self.galactic_registry[current_quadrant[1]][current_quadrant[0]] = summary
         light_blue_translucent = (173, 216, 230, 40)
 
         h_grid_number = 1
@@ -298,8 +296,8 @@ class GameView(arcade.View):
         for i in range(3):
             for j in range(3):
                 try:
-                    x = current_quadrant[1] + (i - 1) - 1
-                    y = current_quadrant[0] + (j - 1) - 1
+                    x = current_quadrant[1] + (i - 1)
+                    y = current_quadrant[0] + (j - 1)
                     if x < 0 or y < 0:
                         raise Exception
                     self.galactic_registry[x][y] = self.lrs_registry[i][j]
@@ -366,9 +364,9 @@ class GameView(arcade.View):
         self.status.draw()
 
     def draw_location(self):
-        ent_quadrant = self.status_info[AppState.ENTERPRISE_POSITION.value]
-        ent_sector = self.status_info[AppState.ENTERPRISE_QUADRANT.value]
-        self.location.text = f"Quadrant: {ent_quadrant[0]}, {ent_quadrant[1]}        Sector:{ent_sector[0]}, {ent_sector[1]}"
+        ent_quadrant = self.status_info[AppState.ENTERPRISE_QUADRANT.value]
+        ent_sector = self.status_info[AppState.ENTERPRISE_POSITION.value]
+        self.location.text = f"Quadrant: {ent_quadrant[0]+1}, {ent_quadrant[1]+1}        Sector: {ent_sector[0]+1}, {ent_sector[1]+1}"
         self.location.draw()
 
     def draw_command_log(self):
@@ -407,7 +405,7 @@ class GameView(arcade.View):
         if self.game_lost:
             self.draw_error_message(msg="GAME OVER")
         if self.game_won:
-            self.draw_error_message(msg="YOU WIN", color = LCARSColors.PURPLE.value)
+            self.draw_error_message(msg="YOU WIN", color=LCARSColors.PURPLE.value)
 
     def draw_prompt(self):
         """Draw prompt."""
