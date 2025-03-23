@@ -372,7 +372,7 @@ class GameView(arcade.View):
             self.show_error = True
         self.text_input = ""
 
-def on_key_press(self, key, key_modifiers):
+    def on_key_press(self, key, key_modifiers):
         """
         Called whenever a key on the keyboard is pressed.
 
