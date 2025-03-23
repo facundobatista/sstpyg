@@ -81,9 +81,9 @@ class GameView(arcade.View):
         self.status = arcade.Text(
             "",
             950,
-            520,
+            465,
             LCARSColors.ORANGE.value,
-            20,
+            24,
             font_name="Okuda",
             width=300,
             multiline=True,
@@ -92,9 +92,9 @@ class GameView(arcade.View):
         self.command_log = arcade.Text(
             "",
             950,
-            220,
+            175,
             LCARSColors.RED.value,
-            20,
+            24,
             font_name="Okuda",
             width=300,
             multiline=True,
@@ -110,7 +110,7 @@ class GameView(arcade.View):
         # Create the sprite lists
         self.background = arcade.SpriteList()
 
-        img = RESOURCES_PATH / "lcars.jpg"
+        img = RESOURCES_PATH / "lcars.png"
         self.bg_sprite = arcade.Sprite(img)
         self.bg_sprite.position = WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2
         self.background.append(self.bg_sprite)
@@ -295,7 +295,7 @@ class GameView(arcade.View):
                 status_text += (
                     f"{getattr(AppStateLabels, AppState(key).name).value}: {value}\n"
                 )
-        self.status.text = "STATUS \n" + status_text
+        self.status.text = "" + status_text
         self.status.draw()
 
     def draw_command_log(self):
