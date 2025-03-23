@@ -121,10 +121,13 @@ class Engine:
     async def cmd_lrs(self):
         qx, qy = self.state.loc_quadrant
         result = []
-        for dx in (-1, 0, +1):
+        for dy in (-1, 0, +1):
             row = []
-            for dy in (-1, 0, +1):
-                quadrant = self.mapa[(qx + dx, qy + dy)]
-                row.append(self._quadrant_summary(quadrant))
+            for dx in (-1, 0, +1):
+                coords = (qx + dx, qy + dy)
+                quadrant = self.mapa[coords]
+                summary = self._quadrant_summary(quadrant)
+                print("====== LRS?", coords, summary)
+                row.append(summary)
             result.append(row)
         return result
