@@ -64,7 +64,7 @@ class GameView(arcade.View):
 
         # Common texts
         self.stardate = arcade.Text(
-            "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
+            "", 250, 660, arcade.color.WHITE, 44, font_name="Okuda"
         )
         self.error_message = arcade.Text(
             "",
@@ -85,10 +85,14 @@ class GameView(arcade.View):
             950,
             465,
             LCARSColors.ORANGE.value,
-            24,
+            22,
             font_name="Okuda",
-            width=300,
+            width=200,
             multiline=True,
+        )
+
+        self.location = arcade.Text(
+            "", 680, 660, arcade.color.WHITE, 44, font_name="Okuda"
         )
 
         self.command_log = arcade.Text(
@@ -112,6 +116,8 @@ class GameView(arcade.View):
         self.positions = []
         self.game_lost = False
         self.game_won = False
+        self.enterprise_sector = ""
+        self.enterprise_quadrant = ""
 
         # Background Sprite
         self.background = arcade.SpriteList()
@@ -148,8 +154,8 @@ class GameView(arcade.View):
             rem_energy = self.status_info[AppState.SHIP_TOTAL_ENERGY.value]
             shields = self.status_info[AppState.SUBSYSTEM_SHIELD.value]
             rem_days = self.status_info[AppState.REMAINING_DAYS.value]
+
             if not (rem_energy and shields and rem_days):
-                # breakpoint()
                 self.game_lost = True
                 self.run_fetch_status = False
 
@@ -159,7 +165,7 @@ class GameView(arcade.View):
                 self.game_won = True
                 self.run_fetch_status = False
 
-            time.sleep(5)
+            time.sleep(0.4)
 
     def generate_space_object_sprite(self, img_file_name, coords, scale):
         img = RESOURCES_PATH / f"{img_file_name}.png"
@@ -357,6 +363,12 @@ class GameView(arcade.View):
         self.status.text = "" + status_text
         self.status.draw()
 
+    def draw_location(self):
+        ent_quadrant = self.status_info[AppState.ENTERPRISE_POSITION.value]
+        ent_sector = self.status_info[AppState.ENTERPRISE_QUADRANT.value]
+        self.location.text = f"Quadrant: {ent_quadrant[0]}, {ent_quadrant[1]}        Sector:{ent_sector[0]}, {ent_sector[1]}"
+        self.location.draw()
+
     def draw_command_log(self):
         """Draw command log."""
         self.command_log.text = self.command_log_history
@@ -373,6 +385,7 @@ class GameView(arcade.View):
         self.stardate.draw()
         self.prompt.draw()
         self.draw_status()
+        self.draw_location()
         self.draw_command_log()
 
     def on_draw(self):
