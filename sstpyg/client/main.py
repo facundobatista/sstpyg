@@ -29,6 +29,12 @@ BASE_PATH = Path(__file__).parent
 RESOURCES_PATH = BASE_PATH / "resources"
 
 
+class RotatingList(list):
+    def __str__(self):
+        repr = [elem for elem in self]
+        return "\n".join(repr[-5:])
+
+
 class GameView(arcade.View):
     def __init__(self, server_address, role):
         super().__init__()
@@ -62,18 +68,29 @@ class GameView(arcade.View):
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
         )
         self.error_message = arcade.Text(
-            "", 590, 310, LCARSColors.RED.value, 144, font_name="Okuda"
+            "", 450, 310, LCARSColors.RED.value, 144, font_name="Okuda"
         )
-        self.stardate.text = "STARDATE 41353.2"
+        self.stardate.text = "STARDATE 41353.0"
         self.prompt = arcade.Text(
             "", 260, 35, arcade.color.WHITE, 44, font_name="Okuda"
         )
         self.status = arcade.Text(
             "",
             950,
-            520,
+            465,
             LCARSColors.ORANGE.value,
-            20,
+            24,
+            font_name="Okuda",
+            width=300,
+            multiline=True,
+        )
+
+        self.command_log = arcade.Text(
+            "",
+            950,
+            175,
+            LCARSColors.RED.value,
+            24,
             font_name="Okuda",
             width=300,
             multiline=True,
@@ -83,7 +100,7 @@ class GameView(arcade.View):
         self.show_grid = False
         self.show_lrs = False
         self.show_grs = False
-        self.show_status = False
+        self.show_status = True
         self.show_error = False
         self.status_info = {}
         self.positions = []
@@ -91,13 +108,15 @@ class GameView(arcade.View):
         # Background Sprite
         self.background = arcade.SpriteList()
 
-        img = RESOURCES_PATH / "lcars.jpg"
+        img = RESOURCES_PATH / "lcars.png"
         self.bg_sprite = arcade.Sprite(img)
         self.bg_sprite.position = WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2
         self.background.append(self.bg_sprite)
 
         # Ship Sprites
         self.space_objects = arcade.SpriteList()
+
+        self.command_log_history = RotatingList()
 
         galactic_registry = [["---" for x in range(0, 8)] for x in range(0, 8)]
         self.galactic_registry = galactic_registry
@@ -198,11 +217,12 @@ class GameView(arcade.View):
                     pass
                 arcade.draw_text(
                     self.lrs_registry[i][j],
-                    340 + j * 90,
-                    462 - i * 90,
+                    440 + j * 100,
+                    410 - i * 100,
                     LCARSColors.BEIGE.value,
                     72,
                     font_name="Okuda",
+                    align="center",
                 )
 
     def draw_grs(self):
@@ -250,8 +270,13 @@ class GameView(arcade.View):
                 status_text += (
                     f"{getattr(AppStateLabels, AppState(key).name).value}: {value}\n"
                 )
-        self.status.text = "STATUS \n" + status_text
+        self.status.text = "" + status_text
         self.status.draw()
+
+    def draw_command_log(self):
+        """Draw command log."""
+        self.command_log.text = self.command_log_history
+        self.command_log.draw()
 
     def reset(self):
         """Reset the game to the initial state."""
@@ -266,6 +291,8 @@ class GameView(arcade.View):
         self.background.draw()
         self.stardate.draw()
         self.prompt.draw()
+        self.draw_status()
+        self.draw_command_log()
         if self.show_grid:
             self.draw_map_grid()
             self.space_objects.draw()
@@ -273,8 +300,6 @@ class GameView(arcade.View):
             self.draw_lrs()
         if self.show_grs:
             self.draw_grs()
-        if self.show_status:
-            self.draw_status()
         if self.show_error:
             self.draw_error_message()
 
@@ -288,28 +313,26 @@ class GameView(arcade.View):
         self.show_error = False
         self.show_grid = False
         self.show_lrs = False
-        self.show_status = False
         self.show_grs = False
 
         command = self.text_input[:3].lower()
         input = self.text_input
+
+        self.command_log_history.append(command)
         if command == "srs":
             arcade.play_sound(self.process_sound, volume=0.5)
             self.positions = self.communication.command({"command": command})
             self.show_grid = True
-            self.show_status = True
         elif command == "lrs":
             arcade.play_sound(self.process_sound, volume=0.5)
             self.lrs_registry = self.communication.command({"command": command})
             self.show_lrs = True
-            self.show_status = True
         elif command == "tor":
             arcade.play_sound(self.process_sound, volume=0.5)
             self.communication.command({"command": command})
         elif command == "grs":
             arcade.play_sound(self.process_sound, volume=0.5)
             self.show_grs = True
-            self.show_status = True
         elif command in ["she", "pha"]:
             arcade.play_sound(self.process_sound, volume=0.5)
             _, energy = input.split(" ")
@@ -349,7 +372,7 @@ class GameView(arcade.View):
             self.show_error = True
         self.text_input = ""
 
-    def on_key_press(self, key, key_modifiers):
+def on_key_press(self, key, key_modifiers):
         """
         Called whenever a key on the keyboard is pressed.
 
