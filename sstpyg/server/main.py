@@ -10,9 +10,12 @@ class GameEngine:
         print(message)
 
         # tmp: fix this
-        from sstpyg.client.mocks import srs
-        message = srs()
+        from sstpyg.client.mocks import srs, lrs
 
+        if command_body["command"] == "srs":
+            message = srs()
+        elif command_body["command"] == "lrs":
+            message = lrs()
         return message
 
     def get_status(self):
@@ -21,6 +24,7 @@ class GameEngine:
 
         # tmp: fix this
         from sstpyg.client.mocks import get_server_info
+
         message = get_server_info()
 
         return message

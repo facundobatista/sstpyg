@@ -3,6 +3,7 @@ from pprint import pprint
 
 from sstpyg.client.constants import AppState
 
+
 def get_server_info():
     return {
         AppState.REMAINING_KLINGONS.value: 10,
@@ -24,6 +25,14 @@ def get_server_info():
         AppState.ENTERPRISE_POSITION.value: (1, 1),
         AppState.ENTERPRISE_QUADRANT.value: (3, 5),
     }
+
+
+def lrs():
+    lrs_list = []
+    for i in range(0, 3):
+        for j in range(0, 3):
+            lrs_list.append((111, 222, 333))
+    return lrs_list
 
 
 def srs():

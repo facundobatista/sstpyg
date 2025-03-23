@@ -1,3 +1,4 @@
+import time
 from math import ceil
 from pathlib import Path
 
@@ -5,7 +6,13 @@ import arcade
 import asyncio
 import threading
 
-from sstpyg.client.constants import LCARSColors, Division, AppState, AppStateLabels, CAPITAN_STATUSES
+from sstpyg.client.constants import (
+    LCARSColors,
+    Division,
+    AppState,
+    AppStateLabels,
+    CAPITAN_STATUSES,
+)
 from sstpyg.client.utils import abs_coords_to_sector_coords, srs_to_positions
 from sstpyg.client.mocks import srs
 from sstpyg.comms.client import ClientHandler
@@ -28,9 +35,7 @@ BASE_PATH = Path(__file__).parent
 RESOURCES_PATH = BASE_PATH / "resources"
 
 
-
 class GameView(arcade.View):
-
     def __init__(self, server_address, role):
         super().__init__()
         self.server_address = server_address
@@ -89,6 +94,10 @@ class GameView(arcade.View):
         galactic_registry = [["---" for x in range(0, 9)] for x in range(0, 9)]
 
         self.galactic_registry = galactic_registry
+
+        lrs_registry = [["---" for x in range(0, 3)] for x in range(0, 3)]
+
+        self.lrs_registry = lrs_registry
         self.start_fetch_status_task()
 
     def start_fetch_status_task(self):
@@ -100,7 +109,6 @@ class GameView(arcade.View):
     def fetch_status_task(self):
         while self.run_fetch_status:
             self.status_info = self.communication.get_status()
-            import time
 
             time.sleep(1)
 
@@ -189,14 +197,15 @@ class GameView(arcade.View):
     def draw_lrs(self):
         """Draw the LRS."""
         for i in range(3):
-            arcade.draw_text(
-                "000 001 002",
-                400,
-                432 - i * 80,
-                LCARSColors.BEIGE.value,
-                70,
-                font_name="Okuda",
-            )
+            for j in range(3):
+                arcade.draw_text(
+                    self.lrs_registry[i][j],
+                    340 + i * 90,
+                    462 - j * 90,
+                    LCARSColors.BEIGE.value,
+                    72,
+                    font_name="Okuda",
+                )
 
     def draw_grs(self):
         """Draw the LRS."""
@@ -221,7 +230,9 @@ class GameView(arcade.View):
         status_text = ""
         for key, value in self.status_info.items():
             if AppState(key) in Division.get_statuses(self.role):
-                status_text += f"{getattr(AppStateLabels, AppState(key).name).value}: {value}\n"
+                status_text += (
+                    f"{getattr(AppStateLabels, AppState(key).name).value}: {value}\n"
+                )
         self.status.text = "STATUS \n" + status_text
         self.status.draw()
 
@@ -277,6 +288,7 @@ class GameView(arcade.View):
             self.show_grid = True
             self.show_status = True
         elif self.text_input == "lrs":
+            self.lrs_registry = self.communication.command({"command": "lrs"})
             self.show_lrs = True
             self.show_status = True
         elif self.text_input == "grs":
