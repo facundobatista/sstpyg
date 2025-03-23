@@ -57,6 +57,9 @@ class GameView(arcade.View):
         tng_process_sound = RESOURCES_PATH / "processing3.mp3"
         self.process_sound = arcade.load_sound(tng_process_sound)
 
+        tng_error_sound = RESOURCES_PATH / "computer_error.mp3"
+        self.error_sound = arcade.load_sound(tng_error_sound)
+
         self.stardate = arcade.Text(
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
         )
@@ -326,14 +329,18 @@ class GameView(arcade.View):
             self.positions = self.communication.command({"command": "srs"})
             self.show_grid = True
             self.show_status = True
+            arcade.play_sound(self.process_sound, volume=0.5)
         elif self.text_input == "lrs":
             self.lrs_registry = self.communication.command({"command": "lrs"})
             self.show_lrs = True
             self.show_status = True
+            arcade.play_sound(self.process_sound, volume=0.5)
         elif self.text_input == "grs":
             self.show_grs = True
             self.show_status = True
+            arcade.play_sound(self.process_sound, volume=0.5)
         elif self.text_input[:3] == "nav":
+            arcade.play_sound(self.process_sound, volume=0.5)
             _, direction, warp_factor = self.text_input.split(" ")
             self.communication.command(
                 {
@@ -342,11 +349,13 @@ class GameView(arcade.View):
                 }
             )
         elif self.text_input in [":q", ":wq", ":wq!", ":q!"]:
+            arcade.play_sound(self.process_sound, volume=0.5)
             self.run_fetch_status = False
             self.thread.join()
             time.sleep(0.5)
             arcade.close_window()
         else:
+            arcade.play_sound(self.error_sound, volume=2.2)
             self.show_error = True
         self.text_input = ""
 
@@ -363,7 +372,6 @@ class GameView(arcade.View):
             self.thread.join()
             arcade.close_window()
         if key == arcade.key.RETURN:
-            arcade.play_sound(self.process_sound, volume=0.5)
             self.process_command()
         elif key == arcade.key.BACKSPACE:
             arcade.play_sound(self.beep_1, volume=0.5)
