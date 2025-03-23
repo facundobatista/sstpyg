@@ -318,56 +318,61 @@ class GameView(arcade.View):
         command = self.text_input[:3].lower()
         input = self.text_input
 
-        self.command_log_history.append(command)
-        if command == "srs":
-            arcade.play_sound(self.process_sound, volume=0.5)
-            self.positions = self.communication.command({"command": command})
-            self.show_grid = True
-        elif command == "lrs":
-            arcade.play_sound(self.process_sound, volume=0.5)
-            self.lrs_registry = self.communication.command({"command": command})
-            self.show_lrs = True
-        elif command == "tor":
-            arcade.play_sound(self.process_sound, volume=0.5)
-            self.communication.command({"command": command})
-        elif command == "grs":
-            arcade.play_sound(self.process_sound, volume=0.5)
-            self.show_grs = True
-        elif command in ["she", "pha"]:
-            arcade.play_sound(self.process_sound, volume=0.5)
-            _, energy = input.split(" ")
-            self.communication.command(
-                {
-                    "command": command,
-                    "parameters": {"energy": energy},
-                }
-            )
-        elif command == "nav":
-            arcade.play_sound(self.process_sound, volume=0.5)
-            _, direction, warp_factor = input.split(" ")
-            self.communication.command(
-                {
-                    "command": command,
-                    "parameters": {"direction": direction, "warp_factor": warp_factor},
-                }
-            )
-        elif command in ["dis", "rep"]:
-            """ Permite asignar energía para el funcionamiento o reparación de cada subsistema """
-            arcade.play_sound(self.process_sound, volume=0.5)
-            _, subsystem, energy = input.split(" ")
-            self.communication.command(
-                {
-                    "command": command,
-                    "parameters": {"subsystem": subsystem, "energy": energy},
-                }
-            )
-        elif command in [":q", ":wq", ":wq!", ":q!"]:
-            arcade.play_sound(self.process_sound, volume=0.5)
-            self.run_fetch_status = False
-            self.thread.join()
-            time.sleep(0.5)
-            arcade.close_window()
-        else:
+        try:
+            if command == "srs":
+                arcade.play_sound(self.process_sound, volume=0.5)
+                self.positions = self.communication.command({"command": command})
+                self.show_grid = True
+            elif command == "lrs":
+                arcade.play_sound(self.process_sound, volume=0.5)
+                self.lrs_registry = self.communication.command({"command": command})
+                self.show_lrs = True
+            elif command == "tor":
+                arcade.play_sound(self.process_sound, volume=0.5)
+                self.communication.command({"command": command})
+            elif command == "grs":
+                arcade.play_sound(self.process_sound, volume=0.5)
+                self.show_grs = True
+            elif command in ["she", "pha"]:
+                arcade.play_sound(self.process_sound, volume=0.5)
+                _, energy = input.split(" ")
+                self.communication.command(
+                    {
+                        "command": command,
+                        "parameters": {"energy": energy},
+                    }
+                )
+            elif command == "nav":
+                arcade.play_sound(self.process_sound, volume=0.5)
+                _, direction, warp_factor = input.split(" ")
+                self.communication.command(
+                    {
+                        "command": command,
+                        "parameters": {"direction": direction, "warp_factor": warp_factor},
+                    }
+                )
+            elif command in ["dis", "rep"]:
+                """ Permite asignar energía para el funcionamiento o reparación de cada subsistema """
+                arcade.play_sound(self.process_sound, volume=0.5)
+                _, subsystem, energy = input.split(" ")
+                self.communication.command(
+                    {
+                        "command": command,
+                        "parameters": {"subsystem": subsystem, "energy": energy},
+                    }
+                )
+            elif command in [":q", ":wq", ":wq!", ":q!"]:
+                arcade.play_sound(self.process_sound, volume=0.5)
+                self.run_fetch_status = False
+                self.thread.join()
+                time.sleep(0.5)
+                arcade.close_window()
+            else:
+                arcade.play_sound(self.error_sound, volume=2.2)
+                self.show_error = True
+                raise Exception
+            self.command_log_history.append(command)
+        except Exception:
             arcade.play_sound(self.error_sound, volume=2.2)
             self.show_error = True
         self.text_input = ""
