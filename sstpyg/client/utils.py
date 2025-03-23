@@ -3,7 +3,6 @@ def srs_to_positions(positions):
     e_positions = []
     s_positions = []
     b_positions = []
-
     for i in range(1, 9):
         for j in range(1, 9):
             content = positions[i - 1][j - 1]

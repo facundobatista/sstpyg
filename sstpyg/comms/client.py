@@ -17,27 +17,30 @@ class ClientHandler:
         """
         Initialize a client in the server with a specific role.
         """
-        response = self.sync_client.get(f"http://{self.server_address}/initialize/{role}")
+        response = self.sync_client.get(
+            f"http://{self.server_address}/initialize/{role}"
+        )
         try:
             return response.json()
         except json.JSONDecodeError:
             pass
 
         return response.text
-
 
     def command(self, command_params):
         """
         Send a command to the server. Command params must be a serializable dictionary.
         """
-        response = self.sync_client.post(f"http://{self.server_address}/command", json=command_params)
+        response = self.sync_client.post(
+            f"http://{self.server_address}/command", json=command_params
+        )
+        print(response.text)
         try:
             return response.json()
         except json.JSONDecodeError:
             pass
 
         return response.text
-
 
     def get_status(self):
         """
