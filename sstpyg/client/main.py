@@ -324,6 +324,13 @@ class GameView(arcade.View):
         elif self.text_input == "grs":
             self.show_grs = True
             self.show_status = True
+        elif self.text_input[:3] == "nav":
+            _, direction, warp_factor = self.text_input.split(' ')
+            self.communication.command({"command": "nav", "parameters": {"direction": direction, "warp_factor": warp_factor}})
+        elif self.text_input in [":q", ":wq"]:
+            self.run_fetch_status = False
+            self.thread.join()
+            arcade.close_window()
         else:
             self.show_error = True
         self.text_input = ""
@@ -344,6 +351,8 @@ class GameView(arcade.View):
             self.process_command()
         elif key == arcade.key.BACKSPACE:
             self.text_input = self.text_input[:-1]
+        elif key == arcade.key.LSHIFT:
+            pass
         else:
             self.text_input += chr(key)
         self.draw_prompt()

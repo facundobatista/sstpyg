@@ -42,7 +42,6 @@ def srs():
     k_objs = 0
     s_objs = 0
     b_objs = 0
-    e_objs = 0
     max_obj = 9
 
     for i in range(0, 8):
