@@ -91,7 +91,7 @@ class GameView(arcade.View):
         self.status_info = {}
         self.positions = []
 
-        galactic_registry = [["---" for x in range(0, 9)] for x in range(0, 9)]
+        galactic_registry = [["---" for x in range(0, 8)] for x in range(0, 8)]
 
         self.galactic_registry = galactic_registry
 
@@ -196,25 +196,36 @@ class GameView(arcade.View):
 
     def draw_lrs(self):
         """Draw the LRS."""
+
+        current_quadrant = self.status_info[AppState.ENTERPRISE_QUADRANT.value]
+
         for i in range(3):
             for j in range(3):
+                try:
+                    x = current_quadrant[1] + (i-1) - 1
+                    y = current_quadrant[0] + (j-1) - 1
+                    if x < 0 or y < 0:
+                        raise Exception
+                    self.galactic_registry[x][y] = self.lrs_registry[i][j]
+                except Exception:
+                    pass
                 arcade.draw_text(
                     self.lrs_registry[i][j],
-                    340 + i * 90,
-                    462 - j * 90,
+                    340 + j * 90,
+                    462 - i * 90,
                     LCARSColors.BEIGE.value,
                     72,
                     font_name="Okuda",
                 )
 
     def draw_grs(self):
-        """Draw the LRS."""
-        for i in range(9):
-            for j in range(9):
+        """Draw the GRS."""
+        for i in range(8):
+            for j in range(8):
                 arcade.draw_text(
                     self.galactic_registry[i][j],
-                    340 + i * 50,
-                    462 - j * 50,
+                    340 + j * 50,
+                    462 - i * 50,
                     LCARSColors.BEIGE.value,
                     40,
                     font_name="Okuda",

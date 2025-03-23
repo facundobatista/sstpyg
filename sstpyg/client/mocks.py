@@ -23,7 +23,7 @@ def get_server_info():
             (1, 8),
         ],
         AppState.ENTERPRISE_POSITION.value: (1, 1),
-        AppState.ENTERPRISE_QUADRANT.value: (3, 5),
+        AppState.ENTERPRISE_QUADRANT.value: (1, 1),
     }
 
 

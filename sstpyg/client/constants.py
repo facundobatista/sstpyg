@@ -46,7 +46,7 @@ class Division(Enum):
                 AppState.SUBSYSTEM_SHIELD,
             ],
         }
-        return mapping[role]
+        return mapping[role] + [AppState.ENTERPRISE_POSITION] + [AppState.ENTERPRISE_QUADRANT]
 
 
 class AppState(Enum):
