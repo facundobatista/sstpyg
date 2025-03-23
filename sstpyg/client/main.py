@@ -70,7 +70,7 @@ class GameView(arcade.View):
         self.stardate_label = arcade.Text(
             "STARDATE", 250, 660, arcade.color.ORANGE, 44, font_name="Okuda"
         )
-
+        self.total_mission_days = None
         self.error_message = arcade.Text(
             "",
             350,
@@ -81,7 +81,8 @@ class GameView(arcade.View):
             align="center",
             width=500,
         )
-        self.stardate.text = STARDATE
+        self.stardate_value = STARDATE
+        self.stardate.text = self.stardate_value
         self.prompt = arcade.Text(
             "", 260, 35, arcade.color.WHITE, 44, font_name="Okuda"
         )
@@ -164,8 +165,11 @@ class GameView(arcade.View):
             status_info[AppState.REMAINING_DAYS.value] = rem_days
 
             self.status_info = status_info
+            if self.total_mission_days is None:
+                self.total_mission_days = float(rem_days)
 
-            if not (rem_energy and shields and rem_days):
+            self.stardate_value = STARDATE + (self.total_mission_days - float(rem_days))
+            if not (rem_energy and shields and float(rem_days) > 0):
                 self.game_lost = True
                 self.run_fetch_status = False
 
@@ -370,6 +374,7 @@ class GameView(arcade.View):
                     f"{getattr(AppStateLabels, AppState(key).name).value}: {value}\n"
                 )
         self.status.text = "" + status_text
+        self.stardate.text = self.stardate_value
         self.status.draw()
 
     def draw_location(self):
