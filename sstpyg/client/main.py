@@ -325,30 +325,40 @@ class GameView(arcade.View):
         self.show_status = False
         self.show_grs = False
 
-        if self.text_input == "srs":
+        command = self.text_input[:3].lower()
+        input = self.text_input
+        if command == "srs":
             self.positions = self.communication.command({"command": "srs"})
             self.show_grid = True
             self.show_status = True
             arcade.play_sound(self.process_sound, volume=0.5)
-        elif self.text_input == "lrs":
+        elif command == "lrs":
             self.lrs_registry = self.communication.command({"command": "lrs"})
             self.show_lrs = True
             self.show_status = True
             arcade.play_sound(self.process_sound, volume=0.5)
-        elif self.text_input == "grs":
+        elif command == "grs":
             self.show_grs = True
             self.show_status = True
             arcade.play_sound(self.process_sound, volume=0.5)
-        elif self.text_input[:3] == "nav":
+        elif command in ["she", "pha"]:
+            _, energy = input.split(" ")
+            self.communication.command(
+                {
+                    "command": command,
+                    "parameters": {"energy": energy},
+                }
+            )
+        elif command == "nav":
             arcade.play_sound(self.process_sound, volume=0.5)
-            _, direction, warp_factor = self.text_input.split(" ")
+            _, direction, warp_factor = input.split(" ")
             self.communication.command(
                 {
                     "command": "nav",
                     "parameters": {"direction": direction, "warp_factor": warp_factor},
                 }
             )
-        elif self.text_input in [":q", ":wq", ":wq!", ":q!"]:
+        elif command in [":q", ":wq", ":wq!", ":q!"]:
             arcade.play_sound(self.process_sound, volume=0.5)
             self.run_fetch_status = False
             self.thread.join()
