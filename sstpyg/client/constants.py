@@ -24,13 +24,13 @@ class Division(Enum):
     @classmethod
     def get_statuses(cls, role):
         mapping = {
-            cls.COMMAND.value.lower():[
+            cls.COMMAND.value.lower(): [
                 AppState.REMAINING_KLINGONS,
                 AppState.REMAINING_DAYS,
                 AppState.SHIP_TOTAL_ENERGY,
-                AppState.SHIP_OK
+                AppState.SHIP_OK,
             ],
-            cls.ENGINEERING.value.lower():[
+            cls.ENGINEERING.value.lower(): [
                 AppState.SHIP_ENG_ENERGY,
                 AppState.SHIP_TOTAL_ENERGY,
                 AppState.SUBSYSTEM_TORPEDO,
@@ -38,15 +38,19 @@ class Division(Enum):
                 AppState.SUBSYSTEM_WARP_ENGINE,
                 AppState.SUBSYSTEM_SHIELD,
                 AppState.SUBSYSTEM_IMPULSE,
-                AppState.SHIP_OK
+                AppState.SHIP_OK,
             ],
-            cls.TACTICAL.value.lower():[
+            cls.TACTICAL.value.lower(): [
                 AppState.SUBSYSTEM_TORPEDO,
                 AppState.SUBSYSTEM_PHASERS,
                 AppState.SUBSYSTEM_SHIELD,
             ],
         }
-        return mapping[role] + [AppState.ENTERPRISE_POSITION] + [AppState.ENTERPRISE_QUADRANT]
+        return (
+            mapping[role]
+            + [AppState.ENTERPRISE_POSITION]
+            + [AppState.ENTERPRISE_QUADRANT]
+        )
 
 
 class AppState(Enum):
@@ -69,7 +73,7 @@ CAPITAN_STATUSES = [
     AppState.REMAINING_KLINGONS,
     AppState.REMAINING_DAYS,
     AppState.SHIP_TOTAL_ENERGY,
-    AppState.SHIP_OK
+    AppState.SHIP_OK,
 ]
 
 
@@ -93,8 +97,8 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 WINDOW_TITLE = "LCARS Template"
 
-GRID_SIZE = 40
-GRID_LEFT = 260
-GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8
-GRID_BOTTOM = 220
-GRID_TOP = GRID_BOTTOM + 40 * 8
+GRID_SIZE = 50
+GRID_LEFT = 300
+GRID_RIGHT = GRID_LEFT + GRID_SIZE * 8 * 1.4
+GRID_BOTTOM = 120
+GRID_TOP = GRID_BOTTOM + GRID_SIZE * 8
