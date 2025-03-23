@@ -47,6 +47,9 @@ class GameView(arcade.View):
         self.background_color = arcade.color.BLACK
         arcade.load_font(RESOURCES_PATH / "Okuda.otf")
         self.run_fetch_status = True
+        tng_bridge_sound = RESOURCES_PATH / "tng_bridge_1.mp3"
+        self.sound_tng_bridge = arcade.load_sound(tng_bridge_sound)
+        arcade.play_sound(self.sound_tng_bridge)
 
         self.stardate = arcade.Text(
             "", 250, 650, arcade.color.WHITE, 44, font_name="Okuda"
@@ -202,8 +205,8 @@ class GameView(arcade.View):
         for i in range(3):
             for j in range(3):
                 try:
-                    x = current_quadrant[1] + (i-1) - 1
-                    y = current_quadrant[0] + (j-1) - 1
+                    x = current_quadrant[1] + (i - 1) - 1
+                    y = current_quadrant[0] + (j - 1) - 1
                     if x < 0 or y < 0:
                         raise Exception
                     self.galactic_registry[x][y] = self.lrs_registry[i][j]
@@ -220,13 +223,13 @@ class GameView(arcade.View):
 
     def draw_grs(self):
         """Draw the GRS."""
-        for i in range(8):        
+        for i in range(8):
             for j in range(8):
                 if i == 0:
                     arcade.draw_text(
                         str(j + 1),
                         340 + j * 70 + 20,
-                        462 - (i-1) * 50,
+                        462 - (i - 1) * 50,
                         LCARSColors.BLUE.value,
                         20,
                         font_name="Okuda",
@@ -325,8 +328,13 @@ class GameView(arcade.View):
             self.show_grs = True
             self.show_status = True
         elif self.text_input[:3] == "nav":
-            _, direction, warp_factor = self.text_input.split(' ')
-            self.communication.command({"command": "nav", "parameters": {"direction": direction, "warp_factor": warp_factor}})
+            _, direction, warp_factor = self.text_input.split(" ")
+            self.communication.command(
+                {
+                    "command": "nav",
+                    "parameters": {"direction": direction, "warp_factor": warp_factor},
+                }
+            )
         elif self.text_input in [":q", ":wq"]:
             self.run_fetch_status = False
             self.thread.join()
