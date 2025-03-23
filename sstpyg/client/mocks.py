@@ -1,12 +1,11 @@
 import random
-from pprint import pprint
 
 from sstpyg.client.constants import AppState
 
 
 def get_server_info():
     return {
-        AppState.REMAINING_KLINGONS.value: 0,
+        AppState.REMAINING_KLINGONS.value: 10,
         AppState.REMAINING_DAYS.value: 10,
         AppState.SHIP_TOTAL_ENERGY.value: 10,
         AppState.SHIP_ENG_ENERGY.value: 10,
@@ -31,7 +30,11 @@ def lrs():
     lrs_list = []
     for i in range(0, 3):
         for j in range(0, 3):
-            lrs_list.append((111, 222, 333))
+            lrs_list.append(( 
+                f'{str(random.randint(0, 1000)):03}',
+                f'{str(random.randint(0, 1000)):03}',
+                f'{str(random.randint(0, 1000)):03}'
+            ))
     return lrs_list
 
 

@@ -152,7 +152,7 @@ class GameView(arcade.View):
                 self.game_won = True
                 self.run_fetch_status = False
 
-            time.sleep(5)
+            time.sleep(1)
 
     def generate_space_object_sprite(self, img_file_name, coords, scale):
         img = RESOURCES_PATH / f"{img_file_name}.png"
@@ -247,7 +247,7 @@ class GameView(arcade.View):
                     self.galactic_registry[x][y] = self.lrs_registry[i][j]
                 except Exception:
                     pass
-                arcade.draw_text(
+                arcade.Text(
                     self.lrs_registry[i][j],
                     440 + j * 100,
                     410 - i * 100,
@@ -255,44 +255,45 @@ class GameView(arcade.View):
                     72,
                     font_name="Okuda",
                     align="center",
-                )
+                ).draw()
 
     def draw_grs(self):
         """Draw the GRS."""
         for i in range(8):
             for j in range(8):
                 if i == 0:
-                    arcade.draw_text(
+                    arcade.Text(
                         str(j + 1),
                         340 + j * 70 + 20,
                         462 - (i - 1) * 50,
                         LCARSColors.BLUE.value,
                         20,
                         font_name="Okuda",
-                    )
+                    ).draw()
                 if j == 0:
-                    arcade.draw_text(
+                    arcade.Text(
                         str(i + 1),
                         340 + j * 70 - 30,
                         462 - i * 50 + 10,
                         LCARSColors.BLUE.value,
                         20,
                         font_name="Okuda",
-                    )
+                    ).draw()
 
-                arcade.draw_text(
+                arcade.Text(
                     self.galactic_registry[i][j],
                     340 + j * 70,
                     462 - i * 50,
                     LCARSColors.BEIGE.value,
                     40,
                     font_name="Okuda",
-                )
+                ).draw()
 
-    def draw_error_message(self, msg="ERROR"):
+    def draw_error_message(self, color=LCARSColors.RED.value, msg="ERROR"):
         """Draw error message."""
         self.reset_screen()
         self.error_message.text = msg
+        self.error_message.color = color
         self.error_message.draw()
 
     def draw_status(self):
@@ -339,9 +340,9 @@ class GameView(arcade.View):
         if self.show_error:
             self.draw_error_message()
         if self.game_lost:
-            self.draw_error_message("GAME OVER")
+            self.draw_error_message(msg="GAME OVER")
         if self.game_won:
-            self.draw_error_message("YOU WIN")
+            self.draw_error_message(msg="YOU WIN", color = LCARSColors.PURPLE.value)
 
     def draw_prompt(self):
         """Draw prompt."""
