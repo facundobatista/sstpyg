@@ -116,5 +116,22 @@ class Engine:
         cuadrante_y = cuadrante[1]
         print(self.mapa[cuadrante_x][cuadrante_y])
 
+    async def cmd_lrs(self):
+        x, y= self.enterprise_loc[0]
+        for cx in (-1, 0, +1):
+            for cy in (-1, 0, +1):
+                cant_klingon = 0
+                cant_stars = 0
+                cant_starbases = 0
+                for cuadrante in self.mapa[x - cx][x - cy]:
+                    for objeto in cuadrante:
+                        if objeto == "klingon":
+                            cant_klingon += 1
+                        elif objeto == "star":
+                            cant_stars += 1
+                        elif objeto == "starbase":
+                            cant_starbases += 1
+                        print(cant_klingon, cant_stars, cant_starbases)
+
     async def get_state(self):
         return self.estado
