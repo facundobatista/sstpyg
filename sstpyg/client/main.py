@@ -35,6 +35,12 @@ BASE_PATH = Path(__file__).parent
 RESOURCES_PATH = BASE_PATH / "resources"
 
 
+class RotatingList(list):
+    def __str__(self):
+        repr = [elem for elem in self]
+        return "\n".join(repr[-5:])
+
+
 class GameView(arcade.View):
     def __init__(self, server_address, role):
         super().__init__()
@@ -67,7 +73,7 @@ class GameView(arcade.View):
             "", 450, 310, LCARSColors.RED.value, 144, font_name="Okuda"
         )
 
-        self.stardate.text = "STARDATE 41353.2"
+        self.stardate.text = "STARDATE 41986.0"
         self.prompt = arcade.Text(
             "", 260, 35, arcade.color.WHITE, 44, font_name="Okuda"
         )
@@ -82,6 +88,18 @@ class GameView(arcade.View):
             width=300,
             multiline=True,
         )
+
+        self.command_log = arcade.Text(
+            "",
+            950,
+            220,
+            LCARSColors.RED.value,
+            20,
+            font_name="Okuda",
+            width=300,
+            multiline=True,
+        )
+
         self.text_input = ""
         self.show_grid = False
         self.show_lrs = False
@@ -102,6 +120,7 @@ class GameView(arcade.View):
 
         self.status_info = {}
         self.positions = []
+        self.command_log_history = RotatingList()
 
         galactic_registry = [["---" for x in range(0, 8)] for x in range(0, 8)]
 
@@ -279,6 +298,11 @@ class GameView(arcade.View):
         self.status.text = "STATUS \n" + status_text
         self.status.draw()
 
+    def draw_command_log(self):
+        """Draw command log."""
+        self.command_log.text = self.command_log_history
+        self.command_log.draw()
+
     def reset(self):
         """Reset the game to the initial state."""
         # Do changes needed to restart the game here if you want to support that
@@ -292,6 +316,8 @@ class GameView(arcade.View):
         self.background.draw()
         self.stardate.draw()
         self.prompt.draw()
+        self.draw_status()
+        self.draw_command_log()
         if self.show_grid:
             self.draw_map_grid()
             self.space_objects.draw()
@@ -299,8 +325,6 @@ class GameView(arcade.View):
             self.draw_lrs()
         if self.show_grs:
             self.draw_grs()
-        if self.show_status:
-            self.draw_status()
         if self.show_error:
             self.draw_error_message()
         # Call draw() on all your sprite lists below
@@ -327,6 +351,8 @@ class GameView(arcade.View):
 
         command = self.text_input[:3].lower()
         input = self.text_input
+
+        self.command_log_history.append(command)
         if command == "srs":
             self.positions = self.communication.command({"command": "srs"})
             self.show_grid = True
