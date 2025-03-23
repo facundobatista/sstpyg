@@ -16,6 +16,7 @@ from sstpyg.client.constants import (
     GRID_BOTTOM,
     GRID_LEFT,
     GRID_SIZE,
+    STARDATE,
     GRID_TOP,
 )
 from sstpyg.client.utils import srs_to_positions
@@ -64,8 +65,12 @@ class GameView(arcade.View):
 
         # Common texts
         self.stardate = arcade.Text(
-            "", 250, 660, arcade.color.WHITE, 44, font_name="Okuda"
+            "", 500, 660, arcade.color.WHITE, 44, font_name="Okuda"
         )
+        self.stardate_label = arcade.Text(
+            "STARDATE", 250, 660, arcade.color.ORANGE, 44, font_name="Okuda"
+        )
+
         self.error_message = arcade.Text(
             "",
             350,
@@ -76,7 +81,7 @@ class GameView(arcade.View):
             align="center",
             width=500,
         )
-        self.stardate.text = "STARDATE 41353.0"
+        self.stardate.text = STARDATE
         self.prompt = arcade.Text(
             "", 260, 35, arcade.color.WHITE, 44, font_name="Okuda"
         )
@@ -386,6 +391,7 @@ class GameView(arcade.View):
     def reset_screen(self):
         self.clear()
         self.background.draw()
+        self.stardate_label.draw()
         self.stardate.draw()
         self.prompt.draw()
         self.draw_status()
