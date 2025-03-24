@@ -16,6 +16,7 @@ from sstpyg.client.constants import (
     GRID_BOTTOM,
     GRID_LEFT,
     GRID_SIZE,
+    STARDATE,
     GRID_TOP,
 )
 from sstpyg.client.utils import srs_to_positions
@@ -64,8 +65,12 @@ class GameView(arcade.View):
 
         # Common texts
         self.stardate = arcade.Text(
-            "", 250, 660, arcade.color.WHITE, 44, font_name="Okuda"
+            "", 500, 660, arcade.color.WHITE, 44, font_name="Okuda"
         )
+        self.stardate_label = arcade.Text(
+            "STARDATE", 250, 660, arcade.color.ORANGE, 44, font_name="Okuda"
+        )
+        self.total_mission_days = None
         self.error_message = arcade.Text(
             "",
             350,
@@ -76,7 +81,8 @@ class GameView(arcade.View):
             align="center",
             width=500,
         )
-        self.stardate.text = "STARDATE 41353.0"
+        self.stardate_value = STARDATE
+        self.stardate.text = self.stardate_value
         self.prompt = arcade.Text(
             "", 260, 35, arcade.color.WHITE, 44, font_name="Okuda"
         )
@@ -149,14 +155,23 @@ class GameView(arcade.View):
 
     def fetch_status_task(self):
         while self.run_fetch_status:
-            self.status_info = self.communication.get_status()
+            status_info = self.communication.get_status()
             # Check a few things in the new info
             # Game over: energy 0, they destroy us, time over
-            rem_energy = self.status_info[AppState.SHIP_TOTAL_ENERGY.value]
-            shields = self.status_info[AppState.SUBSYSTEM_SHIELD.value]
-            rem_days = self.status_info[AppState.REMAINING_DAYS.value]
+            rem_energy = status_info[AppState.SHIP_TOTAL_ENERGY.value]
+            shields = status_info[AppState.SUBSYSTEM_SHIELD.value]
+            # Format value with 2 decimals
+            rem_days = "{:.2f}".format(status_info[AppState.REMAINING_DAYS.value])
+            status_info[AppState.REMAINING_DAYS.value] = rem_days
 
-            if not (rem_energy and shields and rem_days):
+            self.status_info = status_info
+            if self.total_mission_days is None:
+                self.total_mission_days = float(rem_days)
+
+            self.stardate_value = "{:.1f}".format(
+                STARDATE + (self.total_mission_days - float(rem_days))
+            )
+            if not (rem_energy and shields and float(rem_days) > 0):
                 self.game_lost = True
                 self.run_fetch_status = False
 
@@ -361,6 +376,7 @@ class GameView(arcade.View):
                     f"{getattr(AppStateLabels, AppState(key).name).value}: {value}\n"
                 )
         self.status.text = "" + status_text
+        self.stardate.text = self.stardate_value
         self.status.draw()
 
     def draw_location(self):
@@ -382,6 +398,7 @@ class GameView(arcade.View):
     def reset_screen(self):
         self.clear()
         self.background.draw()
+        self.stardate_label.draw()
         self.stardate.draw()
         self.prompt.draw()
         self.draw_status()
@@ -421,6 +438,8 @@ class GameView(arcade.View):
 
         command = self.text_input[:3].lower()
         input = self.text_input
+        if command in ["srs", "lrs", "tor", "grs", "she", "pha", "nav"]:
+            self.command_log_history.append(command)
 
         try:
             if command == "srs":
@@ -449,7 +468,7 @@ class GameView(arcade.View):
             elif command == "nav":
                 arcade.play_sound(self.process_sound, volume=0.5)
                 _, direction, warp_factor = input.split(" ")
-                self.communication.command(
+                actions = self.communication.command(
                     {
                         "command": command,
                         "parameters": {
@@ -458,6 +477,8 @@ class GameView(arcade.View):
                         },
                     }
                 )
+                self.command_log_history += actions
+                self.show_grid = True
             elif command in ["dis", "rep"]:
                 """ Permite asignar energía para el funcionamiento o reparación de cada subsistema """
                 arcade.play_sound(self.process_sound, volume=0.5)
@@ -478,7 +499,6 @@ class GameView(arcade.View):
                 arcade.play_sound(self.error_sound, volume=2.2)
                 self.show_error = True
                 raise Exception
-            self.command_log_history.append(command)
         except Exception:
             arcade.play_sound(self.error_sound, volume=2.2)
             self.show_error = True
