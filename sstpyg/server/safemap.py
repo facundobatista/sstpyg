@@ -61,7 +61,10 @@ class SafeMap:
         raise ValueError("Couldn't find " + repr(to_find))
 
     def walk(self):
-        """Walk through the map, yielding elements."""
-        for row in self.xmap:
-            for item in row:
-                yield item
+        """Walk through the map, yielding elements.
+
+        On each case it returns a tuple of (coords, element).
+        """
+        for y, row in enumerate(self.xmap):
+            for x, item in enumerate(row):
+                yield (x, y), item

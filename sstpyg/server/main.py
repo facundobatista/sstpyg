@@ -87,8 +87,10 @@ class Engine:
 
     def time_goes_by(self):
         """Called once per second."""
-        # FIXME: support the Enterprise being "docked"
-        self.state.remaining_energy -= ENERGYUSE_REGULAR
+        if self.state.docked:
+            self.state.remaining_energy += ENERGYUSE_REGULAR * 10
+        else:
+            self.state.remaining_energy -= ENERGYUSE_REGULAR
 
         # a "mission day" ~= 1 real minute; so once per second we reduce it in 1/60
         self.state.remaining_days -= 1 / 60
@@ -102,12 +104,16 @@ class Engine:
         meth = getattr(self, meth_name, None)
         if meth is None:
             return f"ERROR: missing command: {command!r}"
-        # FIXME: nav, dam, rep, dis, pha, she, tor
+        # FIXME: dam, rep, dis, she, tor
         parameters = command_info.get("parameters", {})
         try:
-            return await meth(**parameters)
+            result = await meth(**parameters)
         except TypeError:
             return f"ERROR: bad parameters: {parameters}"
+
+        # always return a srs
+        srs = await self.cmd_srs()
+        return (result, srs)
 
     async def get_galaxy(self, coords):
         if coords is not None:
@@ -166,7 +172,7 @@ class Engine:
 
             if found == EMPTY:
                 # normal situation
-                messages.append(f"Moved into ({nx}, {ny})")
+                messages.append(f"Moved into ({nx + 1}, {ny + 1})")
                 self.move_enterprise_intraquadrant(
                     self.state.loc_quadrant,
                     (prv_x, prv_y),
@@ -198,7 +204,7 @@ class Engine:
                     # new quadrant does not really exists
                     messages.append("Reached the limit of the galaxy!")
                 else:
-                    messages.append(f"Jumping to quadrant ({nqx}, {nqy})")
+                    messages.append(f"Jumping to quadrant ({nqx + 1}, {nqy + 1})")
                     self.move_enterprise_interquadrant(
                         self.state.loc_quadrant,
                         (prv_x, prv_y),
@@ -206,11 +212,12 @@ class Engine:
                     )
                 self.state.remaining_energy -= ENERGYUSE_MOVE_WARP
 
-                # reaching here after any of weird situations, which imply stop moving
-                break
-
             else:
                 raise ValueError("Bug! Server bad move")
+
+            # reaching here after any of weird situations, which imply stop moving
+            break
+
         return messages
 
     def _nav_warp(self, direction, warp_factor):
@@ -224,19 +231,20 @@ class Engine:
         ny = src_y + int(round(dy))
         found = self.gxmap[(nx, ny)]
         if found is None:
-            return ["Too fast, out of the galaxy, Q brought you back out of pity"]
+            return ["Too fast, bumped into the galactic barrier, Q brought you back out of pity"]
 
         self.move_enterprise_interquadrant(
             self.state.loc_quadrant,
             self.state.loc_sector,
             (nx, ny),
         )
-        return [f"Warping to quadrant ({nx}, {ny})"]
+        return [f"Warping to quadrant ({nx + 1}, {ny + 1})"]
 
     async def cmd_nav(self, direction, warp_factor):
         print("======== nav!!", direction, warp_factor)
         direction = float(direction)
         warp_factor = float(warp_factor)
+        self.state.docked = False
         if warp_factor < 1:
             return self._nav_sublight(direction, warp_factor)
         else:
@@ -250,7 +258,7 @@ class Engine:
         cant_klingon = 0
         cant_stars = 0
         cant_bases = 0
-        for objeto in quadrant.walk():
+        for _, objeto in quadrant.walk():
             if objeto == KLINGON:
                 cant_klingon += 1
             elif objeto == STAR:
@@ -278,3 +286,18 @@ class Engine:
                 row.append(summary)
             result.append(row)
         return result
+
+    async def cmd_pha(self, energy):
+        quadrant = self.gxmap[self.state.loc_quadrant]
+        killed_count = 0
+        for coords, objeto in quadrant.walk():
+            if objeto == KLINGON:
+                # FIXME: maybe the klingon is not destroyed! take attack energy in consideration
+                quadrant[coords] = EMPTY
+                killed_count += 1
+
+        # update state
+        self.remaining_energy -= energy
+        self.state.remaining_klingons -= killed_count
+
+        return [f"Destroyed {killed_count} Klingon ships"]
