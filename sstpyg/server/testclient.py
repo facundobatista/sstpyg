@@ -50,9 +50,13 @@ class AsyncCmd:
             if func is None:
                 print("Error: command not found")
             else:
-                should_exit = await func(rest)
-                if should_exit:
-                    return self._exit()
+                try:
+                    should_exit = await func(rest)
+                except Exception as exc:
+                    print("Error: command exception", exc)
+                else:
+                    if should_exit:
+                        return self._exit()
 
 
 class TestShell(AsyncCmd):
@@ -81,11 +85,23 @@ class TestShell(AsyncCmd):
         quad.show()
 
     async def do_srs(self, arg):
-        quad = await self.engine.command("srs")
-        quad.show()
+        cmd = {"command": "srs"}
+        data = await self.engine.command(cmd)
+        pprint.pprint(data)
 
     async def do_lrs(self, arg):
-        data = await self.engine.command("lrs")
+        cmd = {"command": "lrs"}
+        data = await self.engine.command(cmd)
+        pprint.pprint(data)
+
+    async def do_nav(self, arg):
+        if not arg:
+            print("Error, usage: nav direction speed")
+            return
+
+        direction, speed = tuple(map(float, arg.split()))
+        cmd = {"command": "nav", "parameters": {"direction": direction, "warp_factor": speed}}
+        data = await self.engine.command(cmd)
         pprint.pprint(data)
 
     async def do_state(self, arg):
