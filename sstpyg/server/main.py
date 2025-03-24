@@ -9,7 +9,7 @@ ENTERPRISE = "E"
 EMPTY = ""
 STAR = "S"
 BASE = "B"
-OUTGALAXY = "***"
+OUTGALAXY = "---"
 
 
 @dataclass
@@ -111,7 +111,7 @@ class Engine:
 
     async def cmd_nav(self, direction, warp_factor):
         print("======== nav!!", direction, warp_factor)
-        return ["Move to 1 1", "Bumped at star at 1 1"]
+        return ["Move to 1 1", "Bumped at star at 1."]
 
     async def cmd_srs(self):
         quadrant = self.mapa[self.state.loc_quadrant]
