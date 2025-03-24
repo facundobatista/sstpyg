@@ -444,31 +444,40 @@ class GameView(arcade.View):
         try:
             if command == "srs":
                 arcade.play_sound(self.process_sound, volume=0.5)
-                self.positions = self.communication.command({"command": command})
+                self.positions, _ = self.communication.command({"command": command})
                 self.show_grid = True
             elif command == "lrs":
                 arcade.play_sound(self.process_sound, volume=0.5)
-                self.lrs_registry = self.communication.command({"command": command})
+                self.lrs_registry, self.positions = self.communication.command(
+                    {"command": command}
+                )
                 self.show_lrs = True
             elif command == "tor":
                 arcade.play_sound(self.process_sound, volume=0.5)
-                self.communication.command({"command": command})
+                actions, self.positions = self.communication.command(
+                    {"command": command}
+                )
+                self.command_log_history += actions
             elif command == "grs":
                 arcade.play_sound(self.process_sound, volume=0.5)
                 self.show_grs = True
             elif command in ["she", "pha"]:
                 arcade.play_sound(self.process_sound, volume=0.5)
                 _, energy = input.split(" ")
-                self.communication.command(
+                actions, self.positions = self.communication.command(
                     {
                         "command": command,
                         "parameters": {"energy": energy},
                     }
                 )
+                self.show_grid = True
+                self.show_grs = False
+                self.show_lrs = False
+                self.command_log_history += actions
             elif command == "nav":
                 arcade.play_sound(self.process_sound, volume=0.5)
                 _, direction, warp_factor = input.split(" ")
-                actions = self.communication.command(
+                actions, self.positions = self.communication.command(
                     {
                         "command": command,
                         "parameters": {
@@ -477,6 +486,8 @@ class GameView(arcade.View):
                         },
                     }
                 )
+                self.show_grs = False
+                self.show_lrs = False
                 self.command_log_history += actions
                 self.show_grid = True
             elif command in ["dis", "rep"]:
