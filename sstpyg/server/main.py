@@ -297,7 +297,7 @@ class Engine:
                 killed_count += 1
 
         # update state
-        self.remaining_energy -= energy
+        self.state.remaining_energy -= int(energy)
         self.state.remaining_klingons -= killed_count
 
         return [f"Destroyed {killed_count} Klingon ships"]
