@@ -138,10 +138,10 @@ class GameView(arcade.View):
 
         self.command_log_history = RotatingList()
 
-        galactic_registry = [["---" for x in range(0, 8)] for x in range(0, 8)]
+        galactic_registry = [["..." for x in range(0, 8)] for x in range(0, 8)]
         self.galactic_registry = galactic_registry
 
-        lrs_registry = [["---" for x in range(0, 3)] for x in range(0, 3)]
+        lrs_registry = [["..." for x in range(0, 3)] for x in range(0, 3)]
         self.lrs_registry = lrs_registry
 
         self.start_fetch_status_task()

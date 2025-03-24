@@ -10,7 +10,7 @@ ENTERPRISE = "E"
 EMPTY = ""
 STAR = "S"
 BASE = "B"
-OUTGALAXY = "***"
+OUTGALAXY = "..."
 
 
 ENERGYUSE_REGULAR = 1
@@ -269,7 +269,7 @@ class Engine:
                 quadrant = self.gxmap[coords]
                 if quadrant is None:
                     # out of galaxy
-                    summary = "***"
+                    summary = OUTGALAXY
                 else:
                     values = self._quadrant_summary(quadrant)
                     # top values to 9
