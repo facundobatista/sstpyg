@@ -33,7 +33,6 @@ class Engine:
     enterprise_loc = ()
 
     def __init__(self):
-
         # the galaxy map is 8x8, where each item there is another map 8x8
         self.mapa = SafeMap(8, 8, out_of_map=None)
         for x in range(8):
@@ -112,7 +111,7 @@ class Engine:
 
     async def cmd_nav(self, direction, warp_factor):
         print("======== nav!!", direction, warp_factor)
-        return self.mapa[self.state.loc_quadrant]
+        return ["Move to 1 1", "Bumped at star at 1 1"]
 
     async def cmd_srs(self):
         quadrant = self.mapa[self.state.loc_quadrant]

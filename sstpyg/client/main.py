@@ -168,7 +168,9 @@ class GameView(arcade.View):
             if self.total_mission_days is None:
                 self.total_mission_days = float(rem_days)
 
-            self.stardate_value = STARDATE + (self.total_mission_days - float(rem_days))
+            self.stardate_value = "{:.1f}".format(
+                STARDATE + (self.total_mission_days - float(rem_days))
+            )
             if not (rem_energy and shields and float(rem_days) > 0):
                 self.game_lost = True
                 self.run_fetch_status = False
@@ -436,6 +438,8 @@ class GameView(arcade.View):
 
         command = self.text_input[:3].lower()
         input = self.text_input
+        if command in ["srs", "lrs", "tor", "grs", "she", "pha", "nav"]:
+            self.command_log_history.append(command)
 
         try:
             if command == "srs":
@@ -464,7 +468,7 @@ class GameView(arcade.View):
             elif command == "nav":
                 arcade.play_sound(self.process_sound, volume=0.5)
                 _, direction, warp_factor = input.split(" ")
-                self.communication.command(
+                actions = self.communication.command(
                     {
                         "command": command,
                         "parameters": {
@@ -473,6 +477,8 @@ class GameView(arcade.View):
                         },
                     }
                 )
+                self.command_log_history += actions
+                self.show_grid = True
             elif command in ["dis", "rep"]:
                 """ Permite asignar energía para el funcionamiento o reparación de cada subsistema """
                 arcade.play_sound(self.process_sound, volume=0.5)
@@ -493,7 +499,6 @@ class GameView(arcade.View):
                 arcade.play_sound(self.error_sound, volume=2.2)
                 self.show_error = True
                 raise Exception
-            self.command_log_history.append(command)
         except Exception:
             arcade.play_sound(self.error_sound, volume=2.2)
             self.show_error = True
