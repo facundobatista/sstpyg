@@ -28,10 +28,10 @@ class Division(Enum):
                 AppState.REMAINING_KLINGONS,
                 AppState.REMAINING_DAYS,
                 AppState.SHIP_TOTAL_ENERGY,
+                AppState.DOCKED,
                 AppState.SHIP_OK,
             ],
             cls.ENGINEERING.value.lower(): [
-                AppState.SHIP_ENG_ENERGY,
                 AppState.SHIP_TOTAL_ENERGY,
                 AppState.SUBSYSTEM_TORPEDO,
                 AppState.SUBSYSTEM_PHASERS,
@@ -43,6 +43,7 @@ class Division(Enum):
                 AppState.SUBSYSTEM_TORPEDO,
                 AppState.SUBSYSTEM_PHASERS,
                 AppState.SUBSYSTEM_SHIELD,
+                AppState.DOCKED,
             ],
         }
         return mapping[role]
@@ -63,6 +64,7 @@ class AppState(Enum):
     KLINGON_SHIPS_COORDS = "KSC"
     ENTERPRISE_POSITION = "loc_sector"
     ENTERPRISE_QUADRANT = "loc_quadrant"
+    DOCKED = "docked"
 
 
 CAPITAN_STATUSES = [
@@ -77,6 +79,7 @@ class AppStateLabels(Enum):
     REMAINING_KLINGONS = "Remaining Klingons"
     REMAINING_DAYS = "Remaining Days"
     REMAINING_TORPEDOES = "Remaining Torpedoes"
+    DOCKED = "Docked"
     SHIP_TOTAL_ENERGY = "Ship Total Energy"
     SHIP_ENG_ENERGY = "Ship Engine Energy"
     SHIP_OK = "Ship Status"

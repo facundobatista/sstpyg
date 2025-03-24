@@ -41,7 +41,6 @@ class Engine:
     enterprise_loc = ()
 
     def __init__(self):
-
         # the galaxy map is 8x8, where each item there is another map 8x8
         self.gxmap = SafeMap(8, 8, out_of_map=None)
         for x in range(8):
@@ -103,7 +102,6 @@ class Engine:
         meth = getattr(self, meth_name, None)
         if meth is None:
             return f"ERROR: missing command: {command!r}"
-
         # FIXME: nav, dam, rep, dis, pha, she, tor
         parameters = command_info.get("parameters", {})
         try:
@@ -237,6 +235,8 @@ class Engine:
 
     async def cmd_nav(self, direction, warp_factor):
         print("======== nav!!", direction, warp_factor)
+        direction = float(direction)
+        warp_factor = float(warp_factor)
         if warp_factor < 1:
             return self._nav_sublight(direction, warp_factor)
         else:
